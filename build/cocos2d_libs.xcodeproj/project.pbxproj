@@ -1957,6 +1957,10 @@
 		DABC9FAA19E7DFA900FA252C /* CCClippingRectangleNode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DABC9FA719E7DFA900FA252C /* CCClippingRectangleNode.cpp */; };
 		DABC9FAB19E7DFA900FA252C /* CCClippingRectangleNode.h in Headers */ = {isa = PBXBuildFile; fileRef = DABC9FA819E7DFA900FA252C /* CCClippingRectangleNode.h */; };
 		DABC9FAC19E7DFA900FA252C /* CCClippingRectangleNode.h in Headers */ = {isa = PBXBuildFile; fileRef = DABC9FA819E7DFA900FA252C /* CCClippingRectangleNode.h */; };
+		DBA5B1921A0B3536003B33D6 /* ImageExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DBA5B1901A0B3536003B33D6 /* ImageExtension.cpp */; };
+		DBA5B1931A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DBA5B1911A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp */; };
+		DBEC090E1A0B3A4F0068666D /* ImageExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DBA5B1901A0B3536003B33D6 /* ImageExtension.cpp */; };
+		DBEC090F1A0B3A4F0068666D /* SpriteFrameCacheExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DBA5B1911A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp */; };
 		ED9C6A9418599AD8000A5232 /* CCNodeGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED9C6A9218599AD8000A5232 /* CCNodeGrid.cpp */; };
 		ED9C6A9518599AD8000A5232 /* CCNodeGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = ED9C6A9218599AD8000A5232 /* CCNodeGrid.cpp */; };
 		ED9C6A9618599AD8000A5232 /* CCNodeGrid.h in Headers */ = {isa = PBXBuildFile; fileRef = ED9C6A9318599AD8000A5232 /* CCNodeGrid.h */; };
@@ -3018,6 +3022,8 @@
 		DA8C62A119E52C6400000516 /* ioapi_mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi_mem.h; sourceTree = "<group>"; };
 		DABC9FA719E7DFA900FA252C /* CCClippingRectangleNode.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCClippingRectangleNode.cpp; sourceTree = "<group>"; };
 		DABC9FA819E7DFA900FA252C /* CCClippingRectangleNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCClippingRectangleNode.h; sourceTree = "<group>"; };
+		DBA5B1901A0B3536003B33D6 /* ImageExtension.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ImageExtension.cpp; path = ../../Extensions/ImageExtension.cpp; sourceTree = "<group>"; };
+		DBA5B1911A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SpriteFrameCacheExtension.cpp; path = ../../Extensions/SpriteFrameCacheExtension.cpp; sourceTree = "<group>"; };
 		ED9C6A9218599AD8000A5232 /* CCNodeGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; path = CCNodeGrid.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		ED9C6A9318599AD8000A5232 /* CCNodeGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCNodeGrid.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -4398,6 +4404,7 @@
 		46A167981807AF4D005B8026 /* extensions */ = {
 			isa = PBXGroup;
 			children = (
+				DBA5B18F1A0B34E2003B33D6 /* Nyahoon */,
 				292DB15D19B461CA00A80320 /* ExtensionDeprecated.cpp */,
 				292DB15E19B461CA00A80320 /* ExtensionDeprecated.h */,
 				46A167D21807AF4D005B8026 /* cocos-ext.h */,
@@ -5114,6 +5121,15 @@
 			);
 			name = 3d;
 			path = ../cocos/3d;
+			sourceTree = "<group>";
+		};
+		DBA5B18F1A0B34E2003B33D6 /* Nyahoon */ = {
+			isa = PBXGroup;
+			children = (
+				DBA5B1901A0B3536003B33D6 /* ImageExtension.cpp */,
+				DBA5B1911A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp */,
+			);
+			name = Nyahoon;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -6251,6 +6267,7 @@
 				B29A7E3B19EE1B7700872B35 /* Animation.c in Sources */,
 				15AE1BDE19AAE01E00C27E9E /* CCInvocation.cpp in Sources */,
 				292DB14F19B4574100A80320 /* UIEditBoxImpl-stub.cpp in Sources */,
+				DBA5B1921A0B3536003B33D6 /* ImageExtension.cpp in Sources */,
 				B29A7E0B19EE1B7700872B35 /* Atlas.c in Sources */,
 				15AE199419AAD39600C27E9E /* LayoutReader.cpp in Sources */,
 				1A01C68A18F57BE800EFE3A6 /* CCDeprecated.cpp in Sources */,
@@ -6308,6 +6325,7 @@
 				50643BDE19BFCCA400EF68ED /* LocalStorage-android.cpp in Sources */,
 				15AE1B5B19AADA9900C27E9E /* UITextAtlas.cpp in Sources */,
 				1A570065180BC5A10088DEC7 /* CCActionCamera.cpp in Sources */,
+				DBA5B1931A0B3536003B33D6 /* SpriteFrameCacheExtension.cpp in Sources */,
 				50ABBEAB1925AB6F00A911A9 /* ccTypes.cpp in Sources */,
 				15AE18A219AAD33D00C27E9E /* CCParticleSystemQuadLoader.cpp in Sources */,
 				15AE188C19AAD33D00C27E9E /* CCLabelBMFontLoader.cpp in Sources */,
@@ -6694,6 +6712,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				15AE1B9819AADAA100C27E9E /* UIVideoPlayer-ios.mm in Sources */,
+				DBEC090F1A0B3A4F0068666D /* SpriteFrameCacheExtension.cpp in Sources */,
 				15AE1C0519AAE01E00C27E9E /* CCTableViewCell.cpp in Sources */,
 				15AE198A19AAD36A00C27E9E /* ButtonReader.cpp in Sources */,
 				15AE18D019AAD33D00C27E9E /* CCNodeLoaderLibrary.cpp in Sources */,
@@ -7016,6 +7035,7 @@
 				1A5702FB180BCE750088DEC7 /* CCTMXXMLParser.cpp in Sources */,
 				1A570301180BCE890088DEC7 /* CCParallaxNode.cpp in Sources */,
 				15AE1A4519AAD3D500C27E9E /* b2TimeOfImpact.cpp in Sources */,
+				DBEC090E1A0B3A4F0068666D /* ImageExtension.cpp in Sources */,
 				1A57030D180BCF190088DEC7 /* CCComponent.cpp in Sources */,
 				15AE1B8F19AADA9A00C27E9E /* UIDeprecated.cpp in Sources */,
 				464AD6E6197EBB1400E502D8 /* pvr.cpp in Sources */,
