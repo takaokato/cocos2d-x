@@ -148,6 +148,9 @@ public:
      */
     static void setPVRImagesHavePremultipliedAlpha(bool haveAlphaPremultiplied);
 
+	bool generateMipmaps();
+	bool reduceSize(int mipLevel);
+
 protected:
     bool initWithJpgData(const unsigned char *  data, ssize_t dataLen);
     bool initWithPngData(const unsigned char * data, ssize_t dataLen);

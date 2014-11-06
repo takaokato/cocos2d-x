@@ -223,6 +223,9 @@
     <Filter Include="cocostudio\TimelineAction\trigger">
       <UniqueIdentifier>{0554a5b1-03a1-4d38-87a5-976dbe9a39d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extension\Nyahoon">
+      <UniqueIdentifier>{bf348887-94b4-410a-a06f-3095856860ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\physics\CCPhysicsBody.cpp">
@@ -1264,6 +1267,12 @@
     </ClCompile>
     <ClCompile Include="CCLight.cpp">
       <Filter>2d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Extensions\ImageExtension.cpp">
+      <Filter>extension\Nyahoon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Extensions\SpriteFrameCacheExtension.cpp">
+      <Filter>extension\Nyahoon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -90,6 +90,7 @@ public:
      * @lua addSpriteFrames
      */
     void addSpriteFramesWithFile(const std::string& plist);
+	void addSpriteFramesWithFileEx(const std::string& plist);
 
     /** Adds multiple Sprite Frames from a plist file. The texture will be associated with the created sprite frames.
      @since v0.99.5
