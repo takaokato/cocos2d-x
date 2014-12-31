@@ -238,6 +238,9 @@
     <Filter Include="cocostudio\reader\WidgetReader\SpriteReader">
       <UniqueIdentifier>{9aee531c-f935-4836-bf84-be42e78e38bb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="extension\Nyahoon">
+      <UniqueIdentifier>{bf348887-94b4-410a-a06f-3095856860ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\physics\CCPhysicsBody.cpp">
@@ -1288,6 +1291,12 @@
     </ClCompile>
     <ClCompile Include="..\editor-support\cocostudio\WidgetCallBackHandlerProtocol.cpp">
       <Filter>cocostudio\json</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Extensions\ImageExtension.cpp">
+      <Filter>extension\Nyahoon</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Extensions\SpriteFrameCacheExtension.cpp">
+      <Filter>extension\Nyahoon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
