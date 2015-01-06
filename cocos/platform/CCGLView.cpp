@@ -163,7 +163,7 @@ void GLView::updateDesignResolutionSize()
 
 void GLView::setDesignResolutionSize(float width, float height, ResolutionPolicy resolutionPolicy)
 {
-    CCASSERT(resolutionPolicy != ResolutionPolicy::UNKNOWN, "should set resolutionPolicy");
+    //CCASSERT(resolutionPolicy != ResolutionPolicy::UNKNOWN, "should set resolutionPolicy");
     
     if (width == 0.0f || height == 0.0f)
     {

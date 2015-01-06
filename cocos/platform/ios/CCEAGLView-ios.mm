@@ -152,6 +152,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 		{
 			self.contentScaleFactor = [[UIScreen mainScreen] scale];
 		}
+		[self resize];
     }
         
     return self;
@@ -232,7 +233,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
     
     context_ = [renderer_ context];
     
-    #if GL_EXT_discard_framebuffer == 1
+	#if GL_EXT_discard_framebuffer == 1
         discardFramebufferSupported_ = YES;
     #else
         discardFramebufferSupported_ = NO;
@@ -253,20 +254,26 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 - (void) layoutSubviews
 {
-    [renderer_ resizeFromLayer:(CAEAGLLayer*)self.layer];
-    size_ = [renderer_ backingSize];
+//    [renderer_ resizeFromLayer:(CAEAGLLayer*)self.layer];
+//    size_ = [renderer_ backingSize];
 
     // Issue #914 #924
 //     Director *director = [Director sharedDirector];
 //     [director reshapeProjection:size_];
-    cocos2d::Size size;
-    size.width = size_.width;
-    size.height = size_.height;
+//    cocos2d::Size size;
+//    size.width = size_.width;
+//    size.height = size_.height;
     //cocos2d::Director::getInstance()->reshapeProjection(size);
 
     // Avoid flicker. Issue #350
     //[director performSelectorOnMainThread:@selector(drawScene) withObject:nil waitUntilDone:YES];
     cocos2d::Director::getInstance()->drawScene();
+}
+
+- (void) resize
+{
+	[renderer_ resizeFromLayer:(CAEAGLLayer*)self.layer];
+	size_ = [renderer_ backingSize];
 }
 
 - (void) swapBuffers
