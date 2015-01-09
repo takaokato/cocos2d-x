@@ -517,7 +517,9 @@ CC_CONSTRUCTOR_ACCESS:
 protected:
 
     void updateColor(void);
-    virtual void setTextureCoords(Rect rect);
+public:
+	virtual void setTextureCoords(Rect rect);
+protected:
     virtual void updateBlendFunc(void);
     virtual void setReorderChildDirtyRecursively(void);
     virtual void setDirtyRecursively(bool bValue);

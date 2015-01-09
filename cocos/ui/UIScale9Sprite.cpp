@@ -458,78 +458,159 @@ y+=ytranslate;         \
         }
         
         // Centre
-        if(rotatedcenterbounds.size.width > 0 && rotatedcenterbounds.size.height > 0 )
+		_centre = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcenterbounds, _spriteFrameRotated);
+		_centre->retain();
+        if(rotatedcenterbounds.size.width <= 0 || rotatedcenterbounds.size.height <= 0 )
         {
-            _centre = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcenterbounds, _spriteFrameRotated);
-            _centre->retain();
-            this->addProtectedChild(_centre);
+			Rect rect = rotatedcenterbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_centre->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_centre->setTextureCoords(rotatedcenterbounds);
         }
-        
+		this->addProtectedChild(_centre);
+		
         // Top
-        if(rotatedcentertopbounds.size.width > 0 && rotatedcentertopbounds.size.height > 0 )
+		_top = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcentertopbounds, _spriteFrameRotated);
+		_top->retain();
+        if(rotatedcentertopbounds.size.width <= 0 || rotatedcentertopbounds.size.height <= 0 )
         {
-            _top = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcentertopbounds, _spriteFrameRotated);
-            _top->retain();
-            this->addProtectedChild(_top);
+			Rect rect = rotatedcentertopbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_top->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_top->setTextureCoords(rotatedcentertopbounds);
         }
-        
+		this->addProtectedChild(_top);
+		
         // Bottom
-        if(rotatedcenterbottombounds.size.width > 0 && rotatedcenterbottombounds.size.height > 0 )
+		_bottom = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcenterbottombounds, _spriteFrameRotated);
+		_bottom->retain();
+        if(rotatedcenterbottombounds.size.width <= 0 || rotatedcenterbottombounds.size.height <= 0 )
         {
-            _bottom = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedcenterbottombounds, _spriteFrameRotated);
-            _bottom->retain();
-            this->addProtectedChild(_bottom);
+			Rect rect = rotatedcenterbottombounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_bottom->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_bottom->setTextureCoords(rotatedcenterbottombounds);
         }
-        
+		this->addProtectedChild(_bottom);
+		
         // Left
-        if(rotatedleftcenterbounds.size.width > 0 && rotatedleftcenterbounds.size.height > 0 )
+		_left = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedleftcenterbounds, _spriteFrameRotated);
+		_left->retain();
+        if(rotatedleftcenterbounds.size.width <= 0 || rotatedleftcenterbounds.size.height <= 0 )
         {
-            _left = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedleftcenterbounds, _spriteFrameRotated);
-            _left->retain();
-            this->addProtectedChild(_left);
+			Rect rect = rotatedleftcenterbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_left->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_left->setTextureCoords(rotatedleftcenterbounds);
         }
-        
+		this->addProtectedChild(_left);
+		
         // Right
-        if(rotatedrightcenterbounds.size.width > 0 && rotatedrightcenterbounds.size.height > 0 )
+		_right = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrightcenterbounds, _spriteFrameRotated);
+		_right->retain();
+        if(rotatedrightcenterbounds.size.width <= 0 || rotatedrightcenterbounds.size.height <= 0 )
         {
-            _right = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrightcenterbounds, _spriteFrameRotated);
-            _right->retain();
-            this->addProtectedChild(_right);
+			Rect rect = rotatedrightcenterbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_right->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_right->setTextureCoords(rotatedrightcenterbounds);
         }
-        
+		this->addProtectedChild(_right);
+		
         // Top left
-        if(rotatedlefttopbounds.size.width > 0 && rotatedlefttopbounds.size.height > 0 )
+		_topLeft = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedlefttopbounds, _spriteFrameRotated);
+		_topLeft->retain();
+        if(rotatedlefttopbounds.size.width <= 0 || rotatedlefttopbounds.size.height <= 0 )
         {
-            _topLeft = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedlefttopbounds, _spriteFrameRotated);
-            _topLeft->retain();
-            this->addProtectedChild(_topLeft);
+			Rect rect = rotatedlefttopbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_topLeft->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_topLeft->setTextureCoords(rotatedlefttopbounds);
         }
-        
+		this->addProtectedChild(_topLeft);
+		
         // Top right
-        if(rotatedrighttopbounds.size.width > 0 && rotatedrighttopbounds.size.height > 0 )
+		_topRight = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrighttopbounds, _spriteFrameRotated);
+		_topRight->retain();
+        if(rotatedrighttopbounds.size.width <= 0 || rotatedrighttopbounds.size.height <= 0 )
         {
-            _topRight = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrighttopbounds, _spriteFrameRotated);
-            _topRight->retain();
-            this->addProtectedChild(_topRight);
+			Rect rect = rotatedrighttopbounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_topRight->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_topRight->setTextureCoords(rotatedrighttopbounds);
         }
-        
+		this->addProtectedChild(_topRight);
+		
         // Bottom left
-        if(rotatedleftbottombounds.size.width > 0 && rotatedleftbottombounds.size.height > 0 )
+		_bottomLeft = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedleftbottombounds, _spriteFrameRotated);
+		_bottomLeft->retain();
+        if(rotatedleftbottombounds.size.width <= 0 || rotatedleftbottombounds.size.height <= 0 )
         {
-            _bottomLeft = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedleftbottombounds, _spriteFrameRotated);
-            _bottomLeft->retain();
-            this->addProtectedChild(_bottomLeft);
+			Rect rect = rotatedleftbottombounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_bottomLeft->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_bottomLeft->setTextureCoords(rotatedleftbottombounds);
         }
-        
+		this->addProtectedChild(_bottomLeft);
+		
         // Bottom right
-        if(rotatedrightbottombounds.size.width > 0 && rotatedrightbottombounds.size.height > 0 )
+		_bottomRight = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrightbottombounds, _spriteFrameRotated);
+		_bottomRight->retain();
+        if(rotatedrightbottombounds.size.width <= 0 || rotatedrightbottombounds.size.height <= 0 )
         {
-            _bottomRight = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedrightbottombounds, _spriteFrameRotated);
-            _bottomRight->retain();
-            this->addProtectedChild(_bottomRight);
+			Rect rect = rotatedrightbottombounds;
+			if (rect.size.width <= 0.0f) {
+				rect.size.width = 1.0f;
+			}
+			if (rect.size.height <= 0.0f) {
+				rect.size.height = 1.0f;
+			}
+			_bottomRight->setTextureRect(rect, _spriteFrameRotated, rect.size);
+			_bottomRight->setTextureCoords(rotatedrightbottombounds);
         }
+		this->addProtectedChild(_bottomRight);
     }
-    
+	
     void Scale9Sprite::setContentSize(const Size &size)
     {
         Node::setContentSize(size);
@@ -543,8 +624,8 @@ y+=ytranslate;         \
         float sizableWidth = size.width - _topLeftSize.width - _bottomRightSize.width;
         float sizableHeight = size.height - _topLeftSize.height - _bottomRightSize.height;
         
-        float horizontalScale = sizableWidth/_centerSize.width;
-        float verticalScale = sizableHeight/_centerSize.height;
+		float horizontalScale = sizableWidth/(0.0f < _centerSize.width ? _centerSize.width : 1.0f);
+        float verticalScale = sizableHeight/(0.0f < _centerSize.height ? _centerSize.height : 1.0f);
         
         if(_centre)
         {
@@ -552,9 +633,9 @@ y+=ytranslate;         \
             _centre->setScaleY(verticalScale);
         }
         
-        float rescaledWidth = _centerSize.width * horizontalScale;
-        float rescaledHeight = _centerSize.height * verticalScale;
-        
+		float rescaledWidth = 0.0f < _centerSize.width ? _centerSize.width * horizontalScale : horizontalScale;
+		float rescaledHeight = 0.0f < _centerSize.height ? _centerSize.height * verticalScale : verticalScale;
+		
         float leftWidth = _topLeftSize.width;
         float bottomHeight = _bottomRightSize.height;
         
