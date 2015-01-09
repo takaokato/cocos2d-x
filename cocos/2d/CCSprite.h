@@ -277,6 +277,7 @@ public:
      * @lua NA
      */
     inline V3F_C4B_T2F_Quad getQuad(void) const { return _quad; }
+	inline V3F_C4B_T2F_Quad& getQuadRef() { return _quad; }
 
     /**
      * Returns whether or not the texture rectangle is rotated.
