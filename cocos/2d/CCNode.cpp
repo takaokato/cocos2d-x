@@ -533,6 +533,25 @@ void Node::setScaleY(float scaleY)
 #endif
 }
 
+Vec2 Node::getWorldPosition() const
+{
+	if (_parent == nullptr) {
+		return getPosition();
+	}
+	else {
+		return _parent->convertToWorldSpace(getPosition());
+	}
+}
+
+void Node::setWorldPosition(const Vec2& pos)
+{
+	if (_parent == nullptr) {
+		setPosition(pos);
+	}
+	else {
+		setPosition(_parent->convertToNodeSpace(pos));
+	}
+}
 
 /// position getter
 const Vec2& Node::getPosition() const

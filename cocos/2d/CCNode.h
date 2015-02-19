@@ -326,7 +326,10 @@ public:
     /** returns the normalized position */
     virtual const Vec2& getNormalizedPosition() const;
 
-    /**
+	Vec2 getWorldPosition() const;
+	void setWorldPosition(const Vec2& pos);
+
+	/**
      * Sets the position (x,y) of the node in its parent's coordinate system.
      *
      * Passing two numbers (x,y) is much efficient than passing Vec2 object.
@@ -359,7 +362,7 @@ public:
     virtual void  setPositionY(float y);
     virtual float getPositionY(void) const;
 
-    /**
+	/**
      * Sets the position (X, Y, and Z) in its parent's coordinate system
      */
     virtual void setPosition3D(const Vec3& position);
