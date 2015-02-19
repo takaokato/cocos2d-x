@@ -268,7 +268,16 @@ void Director::drawScene()
         _eventDispatcher->dispatchEvent(_eventAfterUpdate);
     }
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	if (_runningScene != nullptr && !_runningScene->isSceneDirty() && _notificationNode == nullptr) {
+		_eventDispatcher->dispatchEvent(_eventAfterDraw);
+		if (_displayStats)
+		{
+			calculateMPF();
+		}
+		return;
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     /* to avoid flickr, nextScene MUST be here: after tick and before draw.
      * FIXME: Which bug is this one. It seems that it can't be reproduced with v0.9

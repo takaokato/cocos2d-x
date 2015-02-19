@@ -164,6 +164,11 @@ void Scene::render(Renderer* renderer)
     Camera::_visitingCamera = nullptr;
 }
 
+bool Scene::isSceneDirty() const
+{
+	return true;
+}
+
 #if CC_USE_PHYSICS
 void Scene::addChild(Node* child, int zOrder, int tag)
 {

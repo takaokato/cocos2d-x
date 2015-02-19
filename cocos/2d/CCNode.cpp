@@ -2314,6 +2314,22 @@ void Node::setCameraMask(unsigned short mask, bool applyChildren)
     }
 }
 
+bool Node::isTransformUpdatedRecursive() const
+{
+	if (!_visible) {
+		return false;
+	}
+	if (_transformUpdated) {
+		return true;
+	}
+	for (const Node* pChild : _children) {
+		if (pChild->isTransformUpdatedRecursive()) {
+			return true;
+		}
+	}
+	return false;
+}
+
 // MARK: Deprecated
 
 __NodeRGBA::__NodeRGBA()

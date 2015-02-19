@@ -1564,6 +1564,8 @@ public:
     unsigned short getCameraMask() const { return _cameraMask; }
     void setCameraMask(unsigned short mask, bool applyChildren = true);
 
+	bool isTransformUpdatedRecursive() const;
+
 CC_CONSTRUCTOR_ACCESS:
     // Nodes should be created using create();
     Node();

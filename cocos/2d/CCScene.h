@@ -77,6 +77,7 @@ public:
     
     /** render the scene */
     void render(Renderer* renderer);
+	virtual bool isSceneDirty() const;
     
 CC_CONSTRUCTOR_ACCESS:
     Scene();
