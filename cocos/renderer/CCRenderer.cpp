@@ -349,9 +349,11 @@ int Renderer::createRenderQueue()
 void Renderer::visitRenderQueue(const RenderQueue& queue)
 {
     ssize_t size = queue.size();
-    
-    for (ssize_t index = 0; index < size; ++index)
+	
+	// draw from top to bottom.
+    for (ssize_t index = size; 0 < index;)
     {
+		--index;
         auto command = queue[index];
         auto commandType = command->getType();
         if( RenderCommand::Type::TRIANGLES_COMMAND == commandType)
@@ -522,6 +524,7 @@ void Renderer::render()
         {
             renderqueue.sort();
         }
+		glDepthFunc(GL_LESS);
         visitRenderQueue(_renderGroups[0]);
         flush();
         
@@ -530,9 +533,8 @@ void Renderer::render()
         if (0 < _transparentRenderGroups.size())
         {
             _transparentRenderGroups.sort();
-            glEnable(GL_DEPTH_TEST);
+			glDepthFunc(GL_LEQUAL);
             visitTransparentRenderQueue(_transparentRenderGroups);
-            glDisable(GL_DEPTH_TEST);
         }
     }
     clean();

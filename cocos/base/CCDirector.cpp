@@ -237,7 +237,7 @@ void Director::setGLDefaultValues()
     setAlphaBlending(true);
     // FIXME: Fix me, should enable/disable depth test according the depth format as cocos2d-iphone did
     // [self setDepthTest: view_.depthFormat];
-    setDepthTest(false);
+    setDepthTest(true);
     setProjection(_projection);
 
     // set other opengl default values
