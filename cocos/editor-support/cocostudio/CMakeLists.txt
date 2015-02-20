@@ -3,6 +3,8 @@ if(WINDOWS AND BUILD_SHARED_LIBS)
   ADD_DEFINITIONS (-D_USRSTUDIODLL)
 endif()
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fexceptions")
+
 set(COCOS_CS_SRC
 
   editor-support/cocostudio/CCActionFrame.cpp
@@ -57,6 +59,7 @@ set(COCOS_CS_SRC
   editor-support/cocostudio/WidgetReader/SliderReader/SliderReader.cpp
   editor-support/cocostudio/WidgetReader/PageViewReader/PageViewReader.cpp
   editor-support/cocostudio/WidgetReader/TextReader/TextReader.cpp
+  editor-support/cocostudio/WidgetReader/Node3DReader/Node3DReader.cpp  
   editor-support/cocostudio/WidgetReader/TextAtlasReader/TextAtlasReader.cpp
   editor-support/cocostudio/WidgetReader/LayoutReader/LayoutReader.cpp
   editor-support/cocostudio/WidgetReader/TextBMFontReader/TextBMFontReader.cpp
@@ -65,10 +68,12 @@ set(COCOS_CS_SRC
   editor-support/cocostudio/WidgetReader/ScrollViewReader/ScrollViewReader.cpp
   editor-support/cocostudio/ActionTimeline/CCActionTimelineCache.cpp
   editor-support/cocostudio/ActionTimeline/CCActionTimeline.cpp
+  editor-support/cocostudio/ActionTimeline/CCActionTimelineNode.cpp
   editor-support/cocostudio/ActionTimeline/CCFrame.cpp
   editor-support/cocostudio/ActionTimeline/CCTimeLine.cpp
   editor-support/cocostudio/ActionTimeline/CSLoader.cpp
   editor-support/cocostudio/FlatBuffersSerialize.cpp
+  editor-support/cocostudio/WidgetReader/ArmatureNodeReader/ArmatureNodeReader.cpp
 )
 
 include_directories( editor-support )

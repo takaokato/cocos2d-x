@@ -73,6 +73,8 @@ public:
     /** get all cameras */
     const std::vector<Camera*>& getCameras() const { return _cameras; }
 
+    Camera* getDefaultCamera() const { return _defaultCamera; }
+
     const std::vector<BaseLight*>& getLights() const { return _lights; }
     
     /** render the scene */
@@ -86,6 +88,8 @@ CC_CONSTRUCTOR_ACCESS:
     bool init();
     bool initWithSize(const Size& size);
     
+    void setCameraOrderDirty() { _cameraOrderDirty = true; }
+    
     void onProjectionChanged(EventCustom* event);
 
 protected:
@@ -98,6 +102,7 @@ protected:
     
     std::vector<Camera*> _cameras; //weak ref to Camera
     Camera*              _defaultCamera; //weak ref, default camera created by scene, _cameras[0], Caution that the default camera can not be added to _cameras before onEnter is called
+    bool                 _cameraOrderDirty; // order is dirty, need sort
     EventListenerCustom*       _event;
 
     std::vector<BaseLight *> _lights;
@@ -109,7 +114,6 @@ private:
 public:
     virtual void addChild(Node* child, int zOrder, int tag) override;
     virtual void addChild(Node* child, int zOrder, const std::string &name) override;
-    virtual void update(float delta) override;
     inline PhysicsWorld* getPhysicsWorld() { return _physicsWorld; }
     static Scene *createWithPhysics();
     
