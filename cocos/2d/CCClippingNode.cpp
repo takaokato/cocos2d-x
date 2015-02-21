@@ -314,6 +314,8 @@ void ClippingNode::visit(Renderer *renderer, const Mat4 &parentTransform, uint32
     renderer->popGroup();
     
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+
+	_dirtyNode = false;
 }
 
 Node* ClippingNode::getStencil() const

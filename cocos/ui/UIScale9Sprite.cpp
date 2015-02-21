@@ -209,6 +209,7 @@ namespace ui {
             {
                 _scale9Image->setSpriteFrame(sprite->getSpriteFrame());
             }
+			setTransparentFlag(sprite->getTransparentFlag());
         }
         
         if (!_scale9Image)
@@ -465,7 +466,7 @@ namespace ui {
             _centerOffset.x = offsetX;
             _centerOffset.y = offsetY;
         }
-        
+		bool isTransparent = getTransparentFlag();
         // Centre
 		_centerSprite = Sprite::createWithTexture(_scale9Image->getTexture(), rotatedCenterBounds, _spriteFrameRotated);
 		_centerSprite->retain();
@@ -618,6 +619,7 @@ namespace ui {
 			_bottomRightSprite->setTextureCoords(rotatedRightBottomBounds);
         }
 		this->addProtectedChild(_bottomRightSprite);
+		setTransparentFlag(isTransparent);
     }
 
 	void Scale9Sprite::setContentSize(const Size &size)
@@ -1097,7 +1099,8 @@ namespace ui {
         // setOrderOfArrival(0);
         
         director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-        
+
+		_dirtyNode = false;
     }
     
     Size Scale9Sprite::getOriginalSize()const
@@ -1169,6 +1172,7 @@ namespace ui {
     void Scale9Sprite::addProtectedChild(cocos2d::Node *child)
     {
         _reorderProtectedChildDirty = true;
+		_dirtyNode = true;
         _protectedChildren.pushBack(child);
     }
     
@@ -1316,6 +1320,7 @@ namespace ui {
         {
             _scale9Image->updateDisplayedColor(Color3B::WHITE);
         }
+		_dirtyNode = true;
     }
     
     void Scale9Sprite::disableCascadeOpacity()
@@ -1329,6 +1334,7 @@ namespace ui {
         for(auto child : _protectedChildren){
             child->updateDisplayedOpacity(255);
         }
+		_dirtyNode = true;
     }
     
     Sprite* Scale9Sprite::getSprite()const
@@ -1415,5 +1421,35 @@ namespace ui {
         CCASSERT(this->getScaleX() == this->getScaleY(), "Scale9Sprite#scale. ScaleX != ScaleY. Don't know which one to return");
         return this->getScaleX();
     }
-    
+
+	void Scale9Sprite::setTransparentFlag(bool isTransparent)
+	{
+		if (_scale9Image) _scale9Image->setTransparentFlag(isTransparent);
+		if (_topLeftSprite) _topLeftSprite->setTransparentFlag(isTransparent);
+		if (_topSprite) _topSprite->setTransparentFlag(isTransparent);
+		if (_topRightSprite) _topRightSprite->setTransparentFlag(isTransparent);
+		if (_leftSprite) _leftSprite->setTransparentFlag(isTransparent);
+		if (_rightSprite) _rightSprite->setTransparentFlag(isTransparent);
+		if (_bottomLeftSprite) _bottomLeftSprite->setTransparentFlag(isTransparent);
+		if (_bottomSprite) _bottomSprite->setTransparentFlag(isTransparent);
+		if (_bottomRightSprite) _bottomRightSprite->setTransparentFlag(isTransparent);
+		if (_centerSprite) _centerSprite->setTransparentFlag(isTransparent);
+		_dirtyNode = true;
+	}
+
+	bool Scale9Sprite::getTransparentFlag() const
+	{
+		if (_scale9Image) return _scale9Image->getTransparentFlag();
+		if (_topLeftSprite) return _topLeftSprite->getTransparentFlag();
+		if (_topSprite) return _topSprite->getTransparentFlag();
+		if (_topRightSprite) return _topRightSprite->getTransparentFlag();
+		if (_leftSprite) return _leftSprite->getTransparentFlag();
+		if (_rightSprite) return _rightSprite->getTransparentFlag();
+		if (_bottomLeftSprite) return _bottomLeftSprite->getTransparentFlag();
+		if (_bottomSprite) return _bottomSprite->getTransparentFlag();
+		if (_bottomRightSprite) return _bottomRightSprite->getTransparentFlag();
+		if (_centerSprite) return _centerSprite->getTransparentFlag();
+		return true;
+	}
+	
 }}

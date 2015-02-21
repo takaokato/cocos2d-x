@@ -421,6 +421,8 @@ public:
     virtual void setOpacityModifyRGB(bool modify) override;
     virtual bool isOpacityModifyRGB() const override;
     /// @}
+	void setTransparentFlag(bool isTransparent);
+	bool getTransparentFlag() const { return _quadCommand.isTransparent(); }
 
 CC_CONSTRUCTOR_ACCESS:
 

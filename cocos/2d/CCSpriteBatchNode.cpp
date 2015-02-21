@@ -158,6 +158,8 @@ void SpriteBatchNode::visit(Renderer *renderer, const Mat4 &parentTransform, uin
 //    setOrderOfArrival(0);
 
     CC_PROFILER_STOP_CATEGORY(kProfilerCategoryBatchSprite, "CCSpriteBatchNode - visit");
+
+	_dirtyNode = false;
 }
 
 void SpriteBatchNode::addChild(Node *child, int zOrder, int tag)

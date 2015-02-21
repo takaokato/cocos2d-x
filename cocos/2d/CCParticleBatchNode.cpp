@@ -137,6 +137,8 @@ void ParticleBatchNode::visit(Renderer *renderer, const Mat4 &parentTransform, u
     draw(renderer, _modelViewTransform, flags);
 
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+
+	_dirtyNode = false;
 }
 
 // override addChild:

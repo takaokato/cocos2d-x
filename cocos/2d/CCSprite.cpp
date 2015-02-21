@@ -347,6 +347,7 @@ void Sprite::setTexture(Texture2D *texture)
         _texture = texture;
         updateBlendFunc();
     }
+	_dirtyNode = true;
 }
 
 Texture2D* Sprite::getTexture() const
@@ -404,12 +405,14 @@ void Sprite::setTextureRect(const Rect& rect, bool rotated, const Size& untrimme
         _quad.tl.vertices = Vec3(x1, y2, 0);
         _quad.tr.vertices = Vec3(x2, y2, 0);
     }
+	_dirtyNode = true;
 }
 
 // override this method to generate "double scale" sprites
 void Sprite::setVertexRect(const Rect& rect)
 {
     _rect = rect;
+	_dirtyNode = true;
 }
 
 void Sprite::setTextureCoords(Rect rect)
@@ -493,6 +496,7 @@ void Sprite::setTextureCoords(Rect rect)
         _quad.tr.texCoords.u = right;
         _quad.tr.texCoords.v = top;
     }
+	_dirtyNode = true;
 }
 
 // MARK: visit, draw, transform
@@ -919,6 +923,7 @@ void Sprite::setOpacityModifyRGB(bool modify)
     {
         _opacityModifyRGB = modify;
         updateColor();
+		_dirtyNode = true;
     }
 }
 
@@ -1056,6 +1061,14 @@ std::string Sprite::getDescription() const
     else
         texture_id = _texture->getName();
     return StringUtils::format("<Sprite | Tag = %d, TextureID = %d>", _tag, texture_id );
+}
+
+void Sprite::setTransparentFlag(bool isTransparent)
+{
+	if ((!isTransparent) != (!getTransparentFlag())) {
+		_quadCommand.setTransparent(isTransparent);
+		_dirtyNode = true;
+	}
 }
 
 NS_CC_END

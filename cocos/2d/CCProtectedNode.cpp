@@ -335,6 +335,8 @@ void ProtectedNode::visit(Renderer* renderer, const Mat4 &parentTransform, uint3
     // setOrderOfArrival(0);
     
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+
+	_dirtyNode = false;
 }
 
 void ProtectedNode::onEnter()

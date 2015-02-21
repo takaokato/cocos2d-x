@@ -152,6 +152,8 @@ void BillBoard::visit(Renderer *renderer, const Mat4& parentTransform, uint32_t 
     }
     
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+
+	_dirtyNode = false;
 }
 
 bool BillBoard::calculateBillbaordTransform()

@@ -51,11 +51,12 @@ public:
     enum QUEUE_GROUP
     {
         GLOBALZ_NEG = 0,
-        OPAQUE_3D = 1,
-        TRANSPARENT_3D = 2,
-        GLOBALZ_ZERO = 3,
-        GLOBALZ_POS = 4,
-        QUEUE_COUNT = 5,
+		OPAQUE_2D = 1,
+        OPAQUE_3D = 2,
+        TRANSPARENT_3D = 3,
+        GLOBALZ_ZERO = 4,
+        GLOBALZ_POS = 5,
+        QUEUE_COUNT = 6,
     };
 
 public:

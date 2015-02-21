@@ -129,6 +129,7 @@ void BatchNode::visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t 
     // setOrderOfArrival(0);
 
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
+	_dirtyNode = false;
 }
 
 void BatchNode::draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)

@@ -284,9 +284,10 @@ namespace ui {
         float getInsetBottom()const;
         void setScale9Enabled(bool enabled);
         bool isScale9Enabled()const;
-        
-        
-        
+
+		void setTransparentFlag(bool isTransparent);
+		bool getTransparentFlag() const;
+		
         /// @} end of Children and Parent
         
         virtual void visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags) override;
