@@ -334,6 +334,7 @@ void Label::reset()
     _shadowEnabled = false;
     _clipEnabled = false;
     _blendFuncDirty = false;
+	_dirtyNode = true;
 }
 
 void Label::updateShaderProgram()
@@ -420,6 +421,7 @@ void Label::setFontAtlas(FontAtlas* atlas,bool distanceFieldEnabled /* = false *
         _currLabelEffect = LabelEffect::NORMAL;
         updateShaderProgram();
     }
+	_dirtyNode = true;
 }
 
 bool Label::setTTFConfig(const TTFConfig& ttfConfig)
@@ -480,6 +482,7 @@ void Label::setString(const std::string& text)
     {
         _originalUTF8String = text;
         _contentDirty = true;
+		_dirtyNode = true;
 
         std::u16string utf16String;
         if (StringUtils::UTF8ToUTF16(_originalUTF8String, utf16String))
@@ -497,6 +500,7 @@ void Label::setAlignment(TextHAlignment hAlignment,TextVAlignment vAlignment)
         _vAlignment = vAlignment;
 
         _contentDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -506,6 +510,7 @@ void Label::setMaxLineWidth(float maxLineWidth)
     {
         _maxLineWidth = maxLineWidth;
         _contentDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -520,7 +525,8 @@ void Label::setDimensions(float width, float height)
 
         _maxLineWidth = width;
         _contentDirty = true;
-    }  
+		_dirtyNode = true;
+    }
 }
 
 void Label::setLineBreakWithoutSpace(bool breakWithoutSpace)
@@ -528,7 +534,8 @@ void Label::setLineBreakWithoutSpace(bool breakWithoutSpace)
     if (breakWithoutSpace != _lineBreakWithoutSpaces)
     {
         _lineBreakWithoutSpaces = breakWithoutSpace;
-        _contentDirty = true;     
+        _contentDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -745,6 +752,7 @@ void Label::enableGlow(const Color4B& glowColor)
         _effectColorF.b = _effectColor.b / 255.0f;
         _effectColorF.a = _effectColor.a / 255.0f;
         updateShaderProgram();
+		_dirtyNode = true;
     }
 }
 
@@ -775,12 +783,14 @@ void Label::enableOutline(const Color4B& outlineColor,int outlineSize /* = -1 */
         _currLabelEffect = LabelEffect::OUTLINE;
         _contentDirty = true;
     }
+	_dirtyNode = true;
 }
 
 void Label::enableShadow(const Color4B& shadowColor /* = Color4B::BLACK */,const Size &offset /* = Size(2 ,-2)*/, int blurRadius /* = 0 */)
 {
     _shadowEnabled = true;
     _shadowDirty = true;
+	_dirtyNode = true;
 
     _shadowColor.r = shadowColor.r;
     _shadowColor.g = shadowColor.g;
@@ -812,6 +822,7 @@ void Label::disableEffect()
     updateShaderProgram();
     _contentDirty = true;
     _shadowEnabled = false;
+	_dirtyNode = true;
     if (_shadowNode)
     {
         Node::removeChild(_shadowNode,true);
@@ -1139,6 +1150,7 @@ void Label::setSystemFontName(const std::string& systemFont)
     {
         _systemFont = systemFont;
         _systemFontDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -1148,6 +1160,7 @@ void Label::setSystemFontSize(float fontSize)
     {
         _systemFontSize = fontSize;
         _systemFontDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -1203,6 +1216,7 @@ void Label::setLineHeight(float height)
     {
         _commonLineHeight = height;
         _contentDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -1219,6 +1233,7 @@ void Label::setAdditionalKerning(float space)
     {
         _additionalKerning = space;
         _contentDirty = true;
+		_dirtyNode = true;
     }
 }
 
@@ -1277,6 +1292,7 @@ void Label::setOpacityModifyRGB(bool isOpacityModifyRGB)
     if (isOpacityModifyRGB != _isOpacityModifyRGB)
     {
         _isOpacityModifyRGB = isOpacityModifyRGB;
+		_dirtyNode = true;
         updateColor();
     }
 }
@@ -1322,6 +1338,7 @@ void Label::setTextColor(const Color4B &color)
     _textColorF.g = _textColor.g / 255.0f;
     _textColorF.b = _textColor.b / 255.0f;
     _textColorF.a = _textColor.a / 255.0f;
+	_dirtyNode = true;
 }
 
 void Label::updateColor()
@@ -1391,6 +1408,7 @@ void Label::setBlendFunc(const BlendFunc &blendFunc)
 {
     _blendFunc = blendFunc;
     _blendFuncDirty = true;
+	_dirtyNode = true;
     if (_textSprite)
     {
         _textSprite->setBlendFunc(blendFunc);
