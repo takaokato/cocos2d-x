@@ -167,8 +167,6 @@ void NodeGrid::visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t p
     renderer->popGroup();
  
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-
-	_dirtyNode = false;
 }
 
 void NodeGrid::setGrid(GridBase *grid)

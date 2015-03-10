@@ -94,7 +94,6 @@ Node::Node(void)
 , _contentSize(Size::ZERO)
 , _contentSizeDirty(true)
 , _transformDirty(true)
-, _dirtyNode(true)
 , _inverseDirty(true)
 , _useAdditionalTransform(false)
 , _transformUpdated(true)
@@ -216,7 +215,7 @@ Node::~Node()
 
 bool Node::init()
 {
-	_dirtyNode = true;
+	setSceneDirty();
     return true;
 }
 
@@ -267,7 +266,7 @@ void Node::setSkewX(float skewX)
     
     _skewX = skewX;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 float Node::getSkewY() const
@@ -289,7 +288,7 @@ void Node::setSkewY(float skewY)
     
     _skewY = skewY;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::setLocalZOrder(int z)
@@ -304,7 +303,7 @@ void Node::setLocalZOrder(int z)
     }
 
     _eventDispatcher->setDirtyForNode(this);
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 /// zOrder setter : private method
@@ -320,7 +319,7 @@ void Node::setGlobalZOrder(float globalZOrder)
     {
         _globalZOrder = globalZOrder;
         _eventDispatcher->setDirtyForNode(this);
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -339,7 +338,6 @@ void Node::setRotation(float rotation)
     
     _rotationZ_X = _rotationZ_Y = rotation;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
@@ -347,6 +345,7 @@ void Node::setRotation(float rotation)
 #endif
     
     updateRotationQuat();
+	setSceneDirty();
 }
 
 float Node::getRotationSkewX() const
@@ -362,7 +361,6 @@ void Node::setRotation3D(const Vec3& rotation)
         return;
     
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 
     _rotationX = rotation.x;
     _rotationY = rotation.y;
@@ -378,6 +376,7 @@ void Node::setRotation3D(const Vec3& rotation)
         CCLOG("Node WARNING: PhysicsBody doesn't support setRotation3D");
     }
 #endif
+	setSceneDirty();
 }
 
 Vec3 Node::getRotation3D() const
@@ -419,7 +418,7 @@ void Node::setRotationQuat(const Quaternion& quat)
     _rotationQuat = quat;
     updateRotation3D();
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 Quaternion Node::getRotationQuat() const
@@ -441,9 +440,9 @@ void Node::setRotationSkewX(float rotationX)
     
     _rotationZ_X = rotationX;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 	
     updateRotationQuat();
+	setSceneDirty();
 }
 
 float Node::getRotationSkewY() const
@@ -465,9 +464,9 @@ void Node::setRotationSkewY(float rotationY)
     
     _rotationZ_Y = rotationY;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 	
     updateRotationQuat();
+	setSceneDirty();
 }
 
 /// scale getter
@@ -485,12 +484,12 @@ void Node::setScale(float scale)
     
     _scaleX = _scaleY = _scaleZ = scale;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 /// scaleX getter
@@ -508,12 +507,12 @@ void Node::setScale(float scaleX,float scaleY)
     _scaleX = scaleX;
     _scaleY = scaleY;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 /// scaleX setter
@@ -524,12 +523,12 @@ void Node::setScaleX(float scaleX)
     
     _scaleX = scaleX;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 /// scaleY getter
@@ -553,7 +552,7 @@ void Node::setScaleZ(float scaleZ)
     
     _scaleZ = scaleZ;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 /// scaleY getter
@@ -570,12 +569,12 @@ void Node::setScaleY(float scaleY)
     
     _scaleY = scaleY;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 Vec2 Node::getWorldPosition() const
@@ -625,13 +624,13 @@ void Node::setPosition(float x, float y)
     _position.y = y;
     
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
     _usingNormalizedPosition = false;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 void Node::setPosition3D(const Vec3& position)
@@ -676,9 +675,9 @@ void Node::setPositionZ(float positionZ)
         return;
     
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 
     _positionZ = positionZ;
+	setSceneDirty();
 }
 
 /// position getter
@@ -697,12 +696,12 @@ void Node::setNormalizedPosition(const Vec2& position)
     _usingNormalizedPosition = true;
     _normalizedPositionDirty = true;
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 #if CC_USE_PHYSICS
     if (_physicsBody && _physicsBody->getWorld()) {
         _physicsBody->getWorld()->_updateBodyTransform = true;
     }
 #endif
+	setSceneDirty();
 }
 
 ssize_t Node::getChildrenCount() const
@@ -721,20 +720,13 @@ void Node::setVisible(bool visible)
 {
     if(visible != _visible)
     {
+		if (_visible) {
+			setSceneDirty();
+		}
         _visible = visible;
 		if(_visible) {
             _transformUpdated = _transformDirty = _inverseDirty = true;
-			_dirtyNode = true;
-		}
-		else {
-			Node* parent = _parent;
-			while (parent != nullptr) {
-				parent->_dirtyNode = true;
-				if (parent->isVisible()) {
-					break;
-				}
-				parent = parent->getParent();
-			}
+			setSceneDirty();
 		}
     }
 }
@@ -765,7 +757,7 @@ void Node::setAnchorPoint(const Vec2& point)
         _anchorPoint = point;
         _anchorPointInPoints = Vec2(_contentSize.width * _anchorPoint.x, _contentSize.height * _anchorPoint.y);
         _transformUpdated = _transformDirty = _inverseDirty = true;
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -783,7 +775,7 @@ void Node::setContentSize(const Size & size)
 
         _anchorPointInPoints = Vec2(_contentSize.width * _anchorPoint.x, _contentSize.height * _anchorPoint.y);
         _transformUpdated = _transformDirty = _inverseDirty = _contentSizeDirty = true;
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -796,12 +788,14 @@ bool Node::isRunning() const
 /// parent setter
 void Node::setParent(Node * parent)
 {
-    _parent = parent;
-    _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
 	if (_parent != nullptr) {
-		_parent->_dirtyNode = true;
+		_parent->setSceneDirty();
 	}
+    _parent = parent;
+	if (_parent != nullptr) {
+		_parent->setSceneDirty();
+	}
+    _transformUpdated = _transformDirty = _inverseDirty = true;
 }
 
 /// isRelativeAnchorPoint getter
@@ -816,7 +810,7 @@ void Node::ignoreAnchorPointForPosition(bool newValue)
     {
         _ignoreAnchorPointForPosition = newValue;
         _transformUpdated = _transformDirty = _inverseDirty = true;
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -880,7 +874,7 @@ void Node::setGLProgramState(cocos2d::GLProgramState *glProgramState)
         CC_SAFE_RELEASE(_glProgramState);
         _glProgramState = glProgramState;
         CC_SAFE_RETAIN(_glProgramState);
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -1135,8 +1129,7 @@ void Node::addChildHelper(Node* child, int localZOrder, int tag, const std::stri
     {
         updateCascadeOpacity();
     }
-	_dirtyNode = true;
-	child->_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::addChild(Node *child, int zOrder)
@@ -1260,7 +1253,7 @@ void Node::removeAllChildrenWithCleanup(bool cleanup)
     }
     
     _children.clear();
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::detachChild(Node *child, ssize_t childIndex, bool doCleanup)
@@ -1289,7 +1282,6 @@ void Node::detachChild(Node *child, ssize_t childIndex, bool doCleanup)
     child->setParent(nullptr);
 
     _children.erase(childIndex);
-	_dirtyNode = true;
 }
 
 
@@ -1300,16 +1292,16 @@ void Node::insertChild(Node* child, int z)
     _reorderChildDirty = true;
     _children.pushBack(child);
     child->_localZOrder = z;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::reorderChild(Node *child, int zOrder)
 {
     CCASSERT( child != nullptr, "Child must be non-nil");
     _reorderChildDirty = true;
-	_dirtyNode = true;
     child->setOrderOfArrival(s_globalOrderOfArrival++);
     child->_localZOrder = zOrder;
+	setSceneDirty();
 }
 
 void Node::sortAllChildren()
@@ -1440,8 +1432,6 @@ void Node::visit(Renderer* renderer, const Mat4 &parentTransform, uint32_t paren
     // Please refer to https://github.com/cocos2d/cocos2d-x/pull/6920
     // reset for next frame
     // _orderOfArrival = 0;
-
-	_dirtyNode = false;
 }
 
 Mat4 Node::transform(const Mat4& parentTransform)
@@ -1903,7 +1893,7 @@ void Node::setNodeToParentTransform(const Mat4& transform)
     _transform = transform;
     _transformDirty = false;
     _transformUpdated = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::setAdditionalTransform(const AffineTransform& additionalTransform)
@@ -1925,7 +1915,7 @@ void Node::setAdditionalTransform(Mat4* additionalTransform)
         _useAdditionalTransform = true;
     }
     _transformUpdated = _transformDirty = _inverseDirty = true;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 
@@ -2192,9 +2182,9 @@ GLubyte Node::getDisplayedOpacity() const
 void Node::setOpacity(GLubyte opacity)
 {
     _displayedOpacity = _realOpacity = opacity;
-	_dirtyNode = true;
 	
     updateCascadeOpacity();
+	setSceneDirty();
 }
 
 void Node::updateDisplayedOpacity(GLubyte parentOpacity)
@@ -2233,8 +2223,9 @@ void Node::setCascadeOpacityEnabled(bool cascadeOpacityEnabled)
     {
         disableCascadeOpacity();
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
+
 
 void Node::updateCascadeOpacity()
 {
@@ -2251,12 +2242,12 @@ void Node::updateCascadeOpacity()
 void Node::disableCascadeOpacity()
 {
     _displayedOpacity = _realOpacity;
-	_dirtyNode = true;
 	
     for(const auto& child : _children)
     {
         child->updateDisplayedOpacity(255);
     }
+	setSceneDirty();
 }
 
 const Color3B& Node::getColor(void) const
@@ -2272,9 +2263,9 @@ const Color3B& Node::getDisplayedColor() const
 void Node::setColor(const Color3B& color)
 {
     _displayedColor = _realColor = color;
-	_dirtyNode = true;
 	
     updateCascadeColor();
+	setSceneDirty();
 }
 
 void Node::updateDisplayedColor(const Color3B& parentColor)
@@ -2306,7 +2297,6 @@ void Node::setCascadeColorEnabled(bool cascadeColorEnabled)
     }
     
     _cascadeColorEnabled = cascadeColorEnabled;
-	_dirtyNode = true;
 	
     if (_cascadeColorEnabled)
     {
@@ -2316,6 +2306,7 @@ void Node::setCascadeColorEnabled(bool cascadeColorEnabled)
     {
         disableCascadeColor();
     }
+	setSceneDirty();
 }
 
 void Node::updateCascadeColor()
@@ -2327,7 +2318,7 @@ void Node::updateCascadeColor()
     }
     
     updateDisplayedColor(parentColor);
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Node::disableCascadeColor()
@@ -2336,7 +2327,7 @@ void Node::disableCascadeColor()
     {
         child->updateDisplayedColor(Color3B::WHITE);
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 // MARK: Camera
@@ -2350,33 +2341,13 @@ void Node::setCameraMask(unsigned short mask, bool applyChildren)
             child->setCameraMask(mask, applyChildren);
         }
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
-bool Node::isDirtyRecursive() const
+void Node::setSceneDirty()
 {
-	if (!_visible) {
-		return false;
-	}
-	if (_dirtyNode) {
-		return true;
-	}
-	for (const Node* pChild : _children) {
-		if (pChild->isDirtyRecursive()) {
-			return true;
-		}
-	}
-	return false;
-}
-
-void Node::clearDirtyRecursive()
-{
-	if (!_visible) {
-		return;
-	}
-	_dirtyNode = false;
-	for (Node* pChild : _children) {
-		pChild->clearDirtyRecursive();
+	if (_parent != nullptr && _visible) {
+		_parent->setSceneDirty();
 	}
 }
 

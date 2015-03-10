@@ -1099,8 +1099,6 @@ namespace ui {
         // setOrderOfArrival(0);
         
         director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
-
-		_dirtyNode = false;
     }
     
     Size Scale9Sprite::getOriginalSize()const
@@ -1172,7 +1170,7 @@ namespace ui {
     void Scale9Sprite::addProtectedChild(cocos2d::Node *child)
     {
         _reorderProtectedChildDirty = true;
-		_dirtyNode = true;
+		setSceneDirty();
         _protectedChildren.pushBack(child);
     }
     
@@ -1320,7 +1318,7 @@ namespace ui {
         {
             _scale9Image->updateDisplayedColor(Color3B::WHITE);
         }
-		_dirtyNode = true;
+		setSceneDirty();
     }
     
     void Scale9Sprite::disableCascadeOpacity()
@@ -1334,7 +1332,7 @@ namespace ui {
         for(auto child : _protectedChildren){
             child->updateDisplayedOpacity(255);
         }
-		_dirtyNode = true;
+		setSceneDirty();
     }
     
     Sprite* Scale9Sprite::getSprite()const
@@ -1434,7 +1432,7 @@ namespace ui {
 		if (_bottomSprite) _bottomSprite->setTransparentFlag(isTransparent);
 		if (_bottomRightSprite) _bottomRightSprite->setTransparentFlag(isTransparent);
 		if (_centerSprite) _centerSprite->setTransparentFlag(isTransparent);
-		_dirtyNode = true;
+		setSceneDirty();
 	}
 
 	bool Scale9Sprite::getTransparentFlag() const

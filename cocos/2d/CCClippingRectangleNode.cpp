@@ -79,8 +79,6 @@ void ClippingRectangleNode::visit(Renderer *renderer, const Mat4 &parentTransfor
     _afterVisitCmdScissor.init(_globalZOrder);
     _afterVisitCmdScissor.func = CC_CALLBACK_0(ClippingRectangleNode::onAfterVisitScissor, this);
     renderer->addCommand(&_afterVisitCmdScissor);
-
-	_dirtyNode = false;
 }
 
 NS_CC_END

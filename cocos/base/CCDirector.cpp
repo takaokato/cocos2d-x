@@ -272,7 +272,7 @@ void Director::drawScene()
         _eventDispatcher->dispatchEvent(_eventAfterUpdate);
     }
 
-	if (_runningScene != nullptr && !_runningScene->isDirtyRecursive() && _notificationNode == nullptr) {
+	if (_runningScene != nullptr && !_runningScene->isSceneDirty() && _notificationNode == nullptr) {
 		_eventDispatcher->dispatchEvent(_eventAfterDraw);
 		if (_displayStats)
 		{
@@ -315,14 +315,12 @@ void Director::drawScene()
             physicsWorld->_updateBodyTransform = false;
         }
 #endif
-		_runningScene->clearDirtyRecursive();
 	}
 
     // draw the notifications node
     if (_notificationNode)
     {
         _notificationNode->visit(_renderer, Mat4::IDENTITY, 0);
-		_notificationNode->clearDirtyRecursive();
     }
 
     if (_displayStats)

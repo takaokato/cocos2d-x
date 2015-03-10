@@ -1580,8 +1580,7 @@ public:
     unsigned short getCameraMask() const { return _cameraMask; }
     void setCameraMask(unsigned short mask, bool applyChildren = true);
 
-	virtual bool isDirtyRecursive() const;
-	void clearDirtyRecursive();
+	virtual void setSceneDirty();
 
 CC_CONSTRUCTOR_ACCESS:
     // Nodes should be created using create();
@@ -1666,7 +1665,6 @@ protected:
     mutable Mat4 _additionalTransform; ///< transform
     bool _useAdditionalTransform;   ///< The flag to check whether the additional transform is dirty
     bool _transformUpdated;         ///< Whether or not the Transform object was updated since the last frame
-	bool _dirtyNode;                ///< indicates whether the node was modified since the last time the node drawn
 
     int _localZOrder;               ///< Local order (relative to its siblings) used to sort the node
     float _globalZOrder;            ///< Global order used to sort the node

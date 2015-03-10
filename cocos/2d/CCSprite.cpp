@@ -347,7 +347,7 @@ void Sprite::setTexture(Texture2D *texture)
         _texture = texture;
         updateBlendFunc();
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 Texture2D* Sprite::getTexture() const
@@ -405,14 +405,14 @@ void Sprite::setTextureRect(const Rect& rect, bool rotated, const Size& untrimme
         _quad.tl.vertices = Vec3(x1, y2, 0);
         _quad.tr.vertices = Vec3(x2, y2, 0);
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 // override this method to generate "double scale" sprites
 void Sprite::setVertexRect(const Rect& rect)
 {
     _rect = rect;
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 void Sprite::setTextureCoords(Rect rect)
@@ -496,7 +496,7 @@ void Sprite::setTextureCoords(Rect rect)
         _quad.tr.texCoords.u = right;
         _quad.tr.texCoords.v = top;
     }
-	_dirtyNode = true;
+	setSceneDirty();
 }
 
 // MARK: visit, draw, transform
@@ -923,7 +923,7 @@ void Sprite::setOpacityModifyRGB(bool modify)
     {
         _opacityModifyRGB = modify;
         updateColor();
-		_dirtyNode = true;
+		setSceneDirty();
     }
 }
 
@@ -1067,7 +1067,7 @@ void Sprite::setTransparentFlag(bool isTransparent)
 {
 	if ((!isTransparent) != (!getTransparentFlag())) {
 		_quadCommand.setTransparent(isTransparent);
-		_dirtyNode = true;
+		setSceneDirty();
 	}
 }
 

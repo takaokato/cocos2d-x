@@ -48,7 +48,8 @@ Scene::Scene()
     setAnchorPoint(Vec2(0.5f, 0.5f));
     
     _cameraOrderDirty = true;
-    
+	_sceneDirty = true;
+	
     //create default camera
     _defaultCamera = Camera::create();
     addChild(_defaultCamera);
@@ -158,7 +159,21 @@ void Scene::render(Renderer* renderer)
         director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     }
 
+	_sceneDirty = false;
     Camera::_visitingCamera = nullptr;
+}
+
+bool Scene::isSceneDirty() const
+{
+	return _sceneDirty;
+}
+
+void Scene::setSceneDirty()
+{
+	if (_parent != nullptr) {
+		_parent->setSceneDirty();
+	}
+	_sceneDirty = true;
 }
 
 #if CC_USE_PHYSICS

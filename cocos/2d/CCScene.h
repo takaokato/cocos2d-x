@@ -79,7 +79,10 @@ public:
     
     /** render the scene */
     void render(Renderer* renderer);
-    
+
+	virtual bool isSceneDirty() const;
+	virtual void setSceneDirty();
+	
 CC_CONSTRUCTOR_ACCESS:
     Scene();
     virtual ~Scene();
@@ -102,6 +105,7 @@ protected:
     std::vector<Camera*> _cameras; //weak ref to Camera
     Camera*              _defaultCamera; //weak ref, default camera created by scene, _cameras[0], Caution that the default camera can not be added to _cameras before onEnter is called
     bool                 _cameraOrderDirty; // order is dirty, need sort
+	bool                 _sceneDirty;
     EventListenerCustom*       _event;
 
     std::vector<BaseLight *> _lights;
