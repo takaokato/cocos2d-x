@@ -536,31 +536,7 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 		}
 		flush();
 	}
-
-	//
-    //Process Global-Z < 0 Objects
-    //
-    const auto& zNegQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_NEG);
-    if (zNegQueue.size() > 0)
-    {
-        if(_isDepthTestFor2D)
-        {
-			glEnable(GL_DEPTH_TEST);
-			glDepthMask(false);
-			glDepthFunc(GL_LEQUAL);
-        }
-        else
-        {
-            glDisable(GL_DEPTH_TEST);
-            glDepthMask(false);
-        }
-        for (auto it = zNegQueue.cbegin(); it != zNegQueue.cend(); ++it)
-        {
-            processRenderCommand(*it);
-        }
-        flush();
-    }
-    
+	
     //
     //Process Opaque Object
     //
@@ -571,6 +547,7 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
+		glDisable(GL_BLEND);
 		
         for (auto it = opaqueQueue.cbegin(); it != opaqueQueue.cend(); ++it)
         {
@@ -579,7 +556,33 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         flush();
     }
     
-    //
+	glEnable(GL_BLEND);
+	
+	//
+	//Process Global-Z < 0 Objects
+	//
+	const auto& zNegQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_NEG);
+	if (zNegQueue.size() > 0)
+	{
+		if(_isDepthTestFor2D)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(false);
+			glDepthFunc(GL_LEQUAL);
+		}
+		else
+		{
+			glDisable(GL_DEPTH_TEST);
+			glDepthMask(false);
+		}
+		for (auto it = zNegQueue.cbegin(); it != zNegQueue.cend(); ++it)
+		{
+			processRenderCommand(*it);
+		}
+		flush();
+	}
+
+	//
     //Process 3D Transparent object
     //
     const auto& transQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::TRANSPARENT_3D);
