@@ -126,6 +126,9 @@ bool FileUtilsWin32::isAbsolutePath(const std::string& strPath) const
     {
         return true;
     }
+	if (1 <= strPath.length() && (strPath[0] == '/' || strPath[0] == '\\')) {
+		return true;
+	}
     return false;
 }
 
