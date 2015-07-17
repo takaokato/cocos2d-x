@@ -153,6 +153,29 @@ void HttpClient::networkThreadAlone(HttpRequest* request)
     });
 }
 
+void HttpClient::networkThreadAloneUnsafe(HttpRequest* request)
+{
+	// Create a HttpResponse object, the default setting is http access failed
+	HttpResponse *response = new (std::nothrow) HttpResponse(request);
+	char errorBuffer[ERROR_SIZE] = { 0 };
+	processResponse(response, errorBuffer);
+	
+	const ccHttpRequestCallback& callback = request->getCallback();
+	Ref* pTarget = request->getTarget();
+	SEL_HttpResponse pSelector = request->getSelector();
+		
+	if (callback != nullptr)
+	{
+		callback(s_HttpClient, response);
+	}
+	else if (pTarget && pSelector)
+	{
+		(pTarget->*pSelector)(s_HttpClient, response);
+	}
+	response->release();
+	request->release();
+}
+
 //Process Request
 static int processTask(HttpRequest *request, NSString* requestType, void *stream, long *responseCode, void *headerStream, char *errorBuffer)
 {
@@ -472,6 +495,18 @@ void HttpClient::sendImmediate(HttpRequest* request)
     request->retain();
     auto t = std::thread(&HttpClient::networkThreadAlone, this, request);
     t.detach();
+}
+
+void HttpClient::sendImmediateUnsafe(HttpRequest* request)
+{
+	if(!request)
+	{
+		return;
+	}
+	
+	// request->retain(); do not retain in unsafe version. the caller should not release the request. releasing request is not thread safe.
+	auto t = std::thread(&HttpClient::networkThreadAloneUnsafe, this, request);
+	t.detach();
 }
 
 // Poll and notify main thread if responses exists in queue

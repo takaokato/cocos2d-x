@@ -187,6 +187,29 @@ void HttpClient::networkThreadAlone(HttpRequest* request)
     });
 }
 
+void HttpClient::networkThreadAloneUnsafe(HttpRequest* request)
+{
+	// Create a HttpResponse object, the default setting is http access failed
+	HttpResponse *response = new (std::nothrow) HttpResponse(request);
+	char errorBuffer[CURL_ERROR_SIZE] = { 0 };
+	processResponse(response, errorBuffer);
+
+	const ccHttpRequestCallback& callback = request->getCallback();
+	Ref* pTarget = request->getTarget();
+	SEL_HttpResponse pSelector = request->getSelector();
+
+	if (callback != nullptr)
+	{
+		callback(s_pHttpClient, response);
+	}
+	else if (pTarget && pSelector)
+	{
+		(pTarget->*pSelector)(s_pHttpClient, response);
+	}
+	response->release();
+	request->release();
+}
+
 //Configure curl's timeout property
 static bool configureCURL(CURL *handle, char *errorBuffer)
 {
@@ -523,6 +546,18 @@ void HttpClient::sendImmediate(HttpRequest* request)
     request->retain();
     auto t = std::thread(&HttpClient::networkThreadAlone, this, request);
     t.detach();
+}
+
+void HttpClient::sendImmediateUnsafe(HttpRequest* request)
+{
+	if (!request)
+	{
+		return;
+	}
+
+	request->retain();
+	auto t = std::thread(&HttpClient::networkThreadAloneUnsafe, this, request);
+	t.detach();
 }
 
 // Poll and notify main thread if responses exists in queue

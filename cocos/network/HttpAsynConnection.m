@@ -119,6 +119,7 @@
 {
     //NSLog(@"Load failed with error %@", [error localizedDescription]);
     responseError = [error copy];
+	responseCode = 0; // responseCode == 0 means connection failed
     
     finish = true;
 }

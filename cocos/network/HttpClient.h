@@ -76,7 +76,10 @@ public:
                       please make sure request->_requestData is clear before calling "sendImmediate" here.
      */
     void sendImmediate(HttpRequest* request);
-  
+
+	// request will be released in network thread. the caller should not release request.
+	void sendImmediateUnsafe(HttpRequest* request); // receive response in network thread (not the main thread)
+	
     
     /**
      * Change the connect timeout
@@ -116,6 +119,7 @@ private:
     bool lazyInitThreadSemphore();
     void networkThread();
     void networkThreadAlone(HttpRequest* request);
+	void networkThreadAloneUnsafe(HttpRequest* request);
     /** Poll function called from main thread to dispatch callbacks when http requests finished **/
     void dispatchResponseCallbacks();
     

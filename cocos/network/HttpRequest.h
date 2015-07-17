@@ -182,8 +182,14 @@ public:
      */
     CC_DEPRECATED_ATTRIBUTE inline void setResponseCallback(Ref* pTarget, SEL_CallFuncND pSelector)
     {
-        setResponseCallback(pTarget, (SEL_HttpResponse) pSelector);
-    }
+		_pTarget = pTarget;
+		_pSelector = (SEL_HttpResponse)pSelector;
+
+		if (_pTarget)
+		{
+			_pTarget->retain();
+		}
+	}
 
     CC_DEPRECATED_ATTRIBUTE inline void setResponseCallback(Ref* pTarget, SEL_HttpResponse pSelector)
     {
@@ -200,7 +206,12 @@ public:
     {
         _pCallback = callback;
     }
-    
+
+	inline void setResponseCallback(ccHttpRequestCallback&& callback)
+	{
+		_pCallback = std::forward<ccHttpRequestCallback>(callback);
+	}
+	
     /** Get the target of callback selector funtion, mainly used by HttpClient */
     inline Ref* getTarget()
     {
