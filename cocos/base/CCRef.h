@@ -29,7 +29,16 @@ THE SOFTWARE.
 #include "platform/CCPlatformMacros.h"
 #include "base/ccConfig.h"
 
+#if !defined(CC_REF_LEAK_DETECTION)
+#if defined(COCOS2D_DEBUG) && COCOS2D_DEBUG
+#define CC_REF_LEAK_DETECTION 1
+#else
 #define CC_REF_LEAK_DETECTION 0
+#endif
+#endif
+#if CC_REF_LEAK_DETECTION
+#include <list>
+#endif
 
 NS_CC_BEGIN
 
@@ -150,6 +159,8 @@ public:
 #if CC_REF_LEAK_DETECTION
 public:
     static void printLeaks();
+	static size_t getObjectCount();
+	static const std::list<Ref*>& getObjectList();
 #endif
 };
 

@@ -554,8 +554,9 @@ void HttpClient::sendImmediateUnsafe(HttpRequest* request)
 	{
 		return;
 	}
-
-	request->retain();
+	// Do not add reference counter here. Instead, caller should not decrement reference counter.
+	// Because reference counter is not thread safe.
+	// request->retain();
 	auto t = std::thread(&HttpClient::networkThreadAloneUnsafe, this, request);
 	t.detach();
 }

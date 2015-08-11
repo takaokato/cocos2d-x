@@ -169,6 +169,16 @@ void Ref::printLeaks()
     }
 }
 
+size_t Ref::getObjectCount()
+{
+	return __refAllocationList.size();
+}
+
+const std::list<Ref*>& Ref::getObjectList()
+{
+	return __refAllocationList;
+}
+
 static void trackRef(Ref* ref)
 {
     CCASSERT(ref, "Invalid parameter, ref should not be null!");
