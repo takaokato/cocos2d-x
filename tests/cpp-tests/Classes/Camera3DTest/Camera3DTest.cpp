@@ -24,6 +24,9 @@ THE SOFTWARE.
 ****************************************************************************/
 
 #include "Camera3DTest.h"
+#include "testResource.h"
+
+USING_NS_CC;
 
 enum
 {
@@ -32,82 +35,14 @@ enum
     IDC_RESTART
 };
 
-static int sceneIdx = -1;
-
-static std::function<Layer*()> createFunctions[] =
+Camera3DTests::Camera3DTests()
 {
-    CL(CameraRotationTest),
-    CL(Camera3DTestDemo),
-    CL(CameraCullingDemo),
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_WP8)
-    // 3DEffect use custom shader which is not supported on WP8 yet. 
-    CL(FogTestDemo),
-#endif
-    CL(CameraArcBallDemo)
-};
-#define MAX_LAYER    (sizeof(createFunctions) / sizeof(createFunctions[0]))
-
-static Layer*nextTest()
-{
-    sceneIdx++;
-    sceneIdx = sceneIdx % MAX_LAYER;
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
-}
-
-static Layer*backTest()
-{
-    sceneIdx--;
-    int total = MAX_LAYER;
-    if( sceneIdx < 0 )
-        sceneIdx += total;
-    
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
-}
-
-static Layer* restartTest()
-{
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
-}
-
-void Camera3DTestScene::runThisTest()
-{
-    auto layer = nextTest();
-    addChild(layer);
-    Director::getInstance()->replaceScene(this);
-}
-
-//------------------------------------------------------------------
-//
-// CameraBaseTest
-//
-//------------------------------------------------------------------
-
-void CameraBaseTest::restartCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) Camera3DTestScene();
-    s->addChild(restartTest());
-
-    Director::getInstance()->replaceScene(s);
-    s->release();
-}
-
-void CameraBaseTest::nextCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) Camera3DTestScene();
-    s->addChild(nextTest());
-    Director::getInstance()->replaceScene(s);
-    s->release();
-}
-
-void CameraBaseTest::backCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) Camera3DTestScene();
-    s->addChild(backTest());
-    Director::getInstance()->replaceScene(s);
-    s->release();
+    ADD_TEST_CASE(CameraRotationTest);
+    ADD_TEST_CASE(Camera3DTestDemo);
+    ADD_TEST_CASE(CameraCullingDemo);
+    ADD_TEST_CASE(FogTestDemo);
+    ADD_TEST_CASE(CameraArcBallDemo);
+    ADD_TEST_CASE(CameraFrameBufferTest);
 }
 
 //------------------------------------------------------------------
@@ -152,7 +87,7 @@ CameraRotationTest::CameraRotationTest()
     l1->setScale(3);
     bill1->addChild(l1);
 
-    auto p1 = CCParticleSystemQuad::create("Particles/SmallSun.plist");
+    auto p1 = ParticleSystemQuad::create("Particles/SmallSun.plist");
     p1->setPosition(30,80);
     bill1->addChild(p1);
     
@@ -168,7 +103,7 @@ CameraRotationTest::CameraRotationTest()
     l2->setScale(3);
     bill2->addChild(l2);
     
-    auto p2 = CCParticleSystemQuad::create("Particles/SmallSun.plist");
+    auto p2 = ParticleSystemQuad::create("Particles/SmallSun.plist");
     p2->setPosition(30,80);
     bill2->addChild(p2);
 
@@ -220,12 +155,12 @@ std::string CameraRotationTest::subtitle() const
 
 void CameraRotationTest::onEnter()
 {
-    BaseTest::onEnter();
+    CameraBaseTest::onEnter();
 }
 
 void CameraRotationTest::onExit()
 {
-    BaseTest::onExit();
+    CameraBaseTest::onExit();
 }
 
 void CameraRotationTest::update(float dt)
@@ -239,8 +174,8 @@ void CameraRotationTest::update(float dt)
 //------------------------------------------------------------------
 Camera3DTestDemo::Camera3DTestDemo(void)
 : _incRot(nullptr)
-, _camera(nullptr)
 , _decRot(nullptr)
+, _camera(nullptr)
 , _bZoomOut(false)
 , _bZoomIn(false)
 , _bRotateLeft(false)
@@ -319,7 +254,7 @@ void Camera3DTestDemo::SwitchViewCallback(Ref* sender, CameraType cameraType)
 }
 void Camera3DTestDemo::onEnter()
 {
-    BaseTest::onEnter();
+    CameraBaseTest::onEnter();
     _sprite3D=nullptr;
     auto s = Director::getInstance()->getWinSize();
     auto listener = EventListenerTouchAllAtOnce::create();
@@ -432,7 +367,7 @@ void Camera3DTestDemo::onEnter()
 }
 void Camera3DTestDemo::onExit()
 {
-    BaseTest::onExit();
+    CameraBaseTest::onExit();
     if (_camera)
     {
         _camera = nullptr;
@@ -563,8 +498,8 @@ void Camera3DTestDemo::onTouchesEnded(const std::vector<Touch*>& touches, cocos2
                 Vec3 nearP(location.x, location.y, -1.0f), farP(location.x, location.y, 1.0f);
                 
                 auto size = Director::getInstance()->getWinSize();
-                _camera->unproject(size, &nearP, &nearP);
-                _camera->unproject(size, &farP, &farP);
+                nearP = _camera->unproject(nearP);
+                farP = _camera->unproject(farP);
                 Vec3 dir(farP - nearP);
                 float dist=0.0f;
                 float ndd = Vec3::dot(Vec3(0,1,0),dir);
@@ -709,11 +644,7 @@ void Camera3DTestDemo::updateCamera(float fDelta)
         }
     }
 }
-bool Camera3DTestDemo::isState(unsigned int state,unsigned int bit) const
-{
-    return (state & bit) == bit;
-}
-bool Camera3DTestDemo::onTouchesZoomOut(Touch* touch, Event* event)
+bool Camera3DTestDemo::onTouchesCommon(Touch* touch, Event* event, bool* touchProperty)
 {
     auto target = static_cast<Label*>(event->getCurrentTarget());
     
@@ -723,10 +654,18 @@ bool Camera3DTestDemo::onTouchesZoomOut(Touch* touch, Event* event)
     
     if (rect.containsPoint(locationInNode))
     {
-        _bZoomOut = true;
+        *touchProperty = true;
         return true;
     }
     return false;
+}
+bool Camera3DTestDemo::isState(unsigned int state,unsigned int bit) const
+{
+    return (state & bit) == bit;
+}
+bool Camera3DTestDemo::onTouchesZoomOut(Touch* touch, Event* event)
+{
+    return Camera3DTestDemo::onTouchesCommon(touch, event, &_bZoomOut);
 }
 void Camera3DTestDemo::onTouchesZoomOutEnd(Touch* touch, Event* event)
 {
@@ -734,18 +673,7 @@ void Camera3DTestDemo::onTouchesZoomOutEnd(Touch* touch, Event* event)
 }
 bool Camera3DTestDemo::onTouchesZoomIn(Touch* touch, Event* event)
 {
-    auto target = static_cast<Label*>(event->getCurrentTarget());
-    
-    Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
-    Size s = target->getContentSize();
-    Rect rect = Rect(0, 0, s.width, s.height);
-    
-    if (rect.containsPoint(locationInNode))
-    {
-        _bZoomIn = true;
-        return true;
-    }
-    return false;
+    return Camera3DTestDemo::onTouchesCommon(touch, event, &_bZoomIn);
 }
 void Camera3DTestDemo::onTouchesZoomInEnd(Touch* touch, Event* event)
 {
@@ -753,18 +681,7 @@ void Camera3DTestDemo::onTouchesZoomInEnd(Touch* touch, Event* event)
 }
 bool Camera3DTestDemo::onTouchesRotateLeft(Touch* touch, Event* event)
 {
-    auto target = static_cast<Label*>(event->getCurrentTarget());
-    
-    Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
-    Size s = target->getContentSize();
-    Rect rect = Rect(0, 0, s.width, s.height);
-    
-    if (rect.containsPoint(locationInNode))
-    {
-        _bRotateLeft = true;
-        return true;
-    }
-    return false;
+    return Camera3DTestDemo::onTouchesCommon(touch, event, &_bRotateLeft);
 }
 void Camera3DTestDemo::onTouchesRotateLeftEnd(Touch* touch, Event* event)
 {
@@ -772,18 +689,7 @@ void Camera3DTestDemo::onTouchesRotateLeftEnd(Touch* touch, Event* event)
 }
 bool Camera3DTestDemo::onTouchesRotateRight(Touch* touch, Event* event)
 {
-    auto target = static_cast<Label*>(event->getCurrentTarget());
-    
-    Vec2 locationInNode = target->convertToNodeSpace(touch->getLocation());
-    Size s = target->getContentSize();
-    Rect rect = Rect(0, 0, s.width, s.height);
-    
-    if (rect.containsPoint(locationInNode))
-    {
-        _bRotateRight = true;
-        return true;
-    }
-    return false;
+    return Camera3DTestDemo::onTouchesCommon(touch, event, &_bRotateRight);
 }
 void Camera3DTestDemo::onTouchesRotateRightEnd(Touch* touch, Event* event)
 {
@@ -814,16 +720,16 @@ std::string CameraCullingDemo::title() const
 
 void CameraCullingDemo::onEnter()
 {
-    BaseTest::onEnter();
+    CameraBaseTest::onEnter();
 
     schedule(schedule_selector(CameraCullingDemo::update), 0.0f);
     
     auto s = Director::getInstance()->getWinSize();
-    auto listener = EventListenerTouchAllAtOnce::create();
-    listener->onTouchesBegan = CC_CALLBACK_2(CameraCullingDemo::onTouchesBegan, this);
-    listener->onTouchesMoved = CC_CALLBACK_2(CameraCullingDemo::onTouchesMoved, this);
-    listener->onTouchesEnded = CC_CALLBACK_2(CameraCullingDemo::onTouchesEnded, this);
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+    /*auto listener = EventListenerTouchAllAtOnce::create();
+    listener->onTouchesBegan = CC_CALLBACK_2(Camera3DTestDemo::onTouchesBegan, this);
+    listener->onTouchesMoved = CC_CALLBACK_2(Camera3DTestDemo::onTouchesMoved, this);
+    listener->onTouchesEnded = CC_CALLBACK_2(Camera3DTestDemo::onTouchesEnded, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);*/
     auto layer3D=Layer::create();
     addChild(layer3D,0);
     _layer3D=layer3D;
@@ -876,7 +782,7 @@ void CameraCullingDemo::onEnter()
 
 void CameraCullingDemo::onExit()
 {
-    BaseTest::onExit();
+    CameraBaseTest::onExit();
     if (_cameraFirst)
     {
         _cameraFirst = nullptr;
@@ -911,8 +817,9 @@ void CameraCullingDemo::update(float dt)
 void CameraCullingDemo::reachEndCallBack()
 {
     _cameraFirst->stopActionByTag(100);
-    auto inverse = (MoveTo*)_moveAction->reverse();
+    auto inverse = MoveTo::create(4.f, Vec2(-_cameraFirst->getPositionX(), 0));
     inverse->retain();
+    
     _moveAction->release();
     _moveAction = inverse;
     auto rot = RotateBy::create(1.f, Vec3(0.f, 180.f, 0.f));
@@ -931,7 +838,7 @@ void CameraCullingDemo::switchViewCallback(Ref* sender)
         _cameraFirst->setCameraFlag(CameraFlag::USER8);
         _cameraFirst->setPosition3D(Vec3(-100,0,0));
         _cameraFirst->lookAt(Vec3(1000,0,0));
-        _moveAction = MoveTo::create(4.f, Vec2(100, 0));
+        _moveAction = MoveTo::create(4.f, Vec2(-_cameraFirst->getPositionX(), 0));
         _moveAction->retain();
         auto seq = Sequence::create(_moveAction, CallFunc::create(CC_CALLBACK_0(CameraCullingDemo::reachEndCallBack, this)), nullptr);
         seq->setTag(100);
@@ -1029,30 +936,30 @@ void CameraCullingDemo::drawCameraFrustum()
     // top-left
     Vec3 tl_0,tl_1;
     Vec3 src(0,0,0);
-    _cameraFirst->unproject(size, &src, &tl_0);
+    tl_0 = _cameraFirst->unproject(src);
     src = Vec3(0,0,1);
-    _cameraFirst->unproject(size, &src, &tl_1);
+    tl_1 = _cameraFirst->unproject(src);
     
     // top-right
     Vec3 tr_0,tr_1;
     src = Vec3(size.width,0,0);
-    _cameraFirst->unproject(size, &src, &tr_0);
+    tr_0 = _cameraFirst->unproject(src);
     src = Vec3(size.width,0,1);
-    _cameraFirst->unproject(size, &src, &tr_1);
+    tr_1 = _cameraFirst->unproject(src);
     
     // bottom-left
     Vec3 bl_0,bl_1;
     src = Vec3(0,size.height,0);
-    _cameraFirst->unproject(size, &src, &bl_0);
+    bl_0 = _cameraFirst->unproject(src);
     src = Vec3(0,size.height,1);
-    _cameraFirst->unproject(size, &src, &bl_1);
+    bl_1 = _cameraFirst->unproject(src);
     
     // bottom-right
     Vec3 br_0,br_1;
     src = Vec3(size.width,size.height,0);
-    _cameraFirst->unproject(size, &src, &br_0);
+    br_0 = _cameraFirst->unproject(src);
     src = Vec3(size.width,size.height,1);
-    _cameraFirst->unproject(size, &src, &br_1);
+    br_1 = _cameraFirst->unproject(src);
     
     _drawFrustum->drawLine(tl_0, tl_1, color);
     _drawFrustum->drawLine(tr_0, tr_1, color);
@@ -1077,14 +984,14 @@ CameraArcBallDemo::CameraArcBallDemo(void)
 , _layer3D(nullptr)
 , _cameraType(CameraType::Free)
 , _camera(nullptr)
-,_drawGrid(nullptr)
-,_sprite3D1(nullptr)
-,_sprite3D2(nullptr)
-,_radius(1.0f)
-,_distanceZ(50.0f)
-,_operate(OperateCamType::RotateCamera)
-,_center(Vec3(0,0,0))
-,_target(0)
+, _drawGrid(nullptr)
+, _radius(1.0f)
+, _distanceZ(50.0f)
+, _operate(OperateCamType::RotateCamera)
+, _center(Vec3(0,0,0))
+, _target(0)
+, _sprite3D1(nullptr)
+, _sprite3D2(nullptr)
 {
 }
 CameraArcBallDemo::~CameraArcBallDemo(void)
@@ -1098,7 +1005,7 @@ std::string CameraArcBallDemo::title() const
 
 void CameraArcBallDemo::onEnter()
 {
-    BaseTest::onEnter();
+    CameraBaseTest::onEnter();
     _rotationQuat.set(0.0f, 0.0f, 0.0f, 1.0f);
     schedule(schedule_selector(CameraArcBallDemo::update), 0.0f);
     auto s = Director::getInstance()->getWinSize();
@@ -1170,7 +1077,7 @@ void CameraArcBallDemo::onEnter()
 
 void CameraArcBallDemo::onExit()
 {
-    BaseTest::onExit();
+    CameraBaseTest::onExit();
     if (_camera)
     {
         _camera = nullptr;
@@ -1315,7 +1222,7 @@ std::string FogTestDemo::title() const
 
 void FogTestDemo::onEnter()
 {
-    BaseTest::onEnter();
+    CameraBaseTest::onEnter();
     schedule(schedule_selector(FogTestDemo::update), 0.0f);
     Director::getInstance()->setClearColor(Color4F(0.5,0.5,0.5,1));
 
@@ -1409,7 +1316,7 @@ void FogTestDemo::onEnter()
     _layer3D->setCameraMask(2);
 
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     _backToForegroundListener = EventListenerCustom::create(EVENT_RENDERER_RECREATED,
                                                             [this](EventCustom*)
                                                             {
@@ -1465,14 +1372,14 @@ void FogTestDemo::switchTypeCallback(Ref* sender,int type)
 
 void FogTestDemo::onExit()
 {
-    BaseTest::onExit();
+    CameraBaseTest::onExit();
     Director::getInstance()->setClearColor(Color4F(0,0,0,1));
     if (_camera)
     {
         _camera = nullptr;
     }
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WP8 || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
     Director::getInstance()->getEventDispatcher()->removeEventListener(_backToForegroundListener);
 #endif
 }
@@ -1504,4 +1411,70 @@ void FogTestDemo::onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::Ev
             _camera->setPosition3D(cameraPos);
         }
     }
+}
+
+CameraFrameBufferTest::CameraFrameBufferTest()
+{
+    
+}
+
+CameraFrameBufferTest::~CameraFrameBufferTest()
+{
+    
+}
+
+std::string CameraFrameBufferTest::title() const
+{
+    return "Camera FrameBuffer Object Test";
+}
+
+void CameraFrameBufferTest::onEnter()
+{
+    auto sizeInpixels = Director::getInstance()->getWinSizeInPixels();
+    auto size = Director::getInstance()->getWinSize();
+    auto fboSize = Size(sizeInpixels.width * 1, sizeInpixels.height * 1.5);
+    auto fbo = experimental::FrameBuffer::create(1, fboSize.width, fboSize.height);
+    
+    CameraBaseTest::onEnter();
+    //auto sprite = Sprite::createWithTexture(fbo);
+    //sprite->setPosition(Vec2(100,100));
+    //std::string filename = "Sprite3DTest/girl.c3b";
+    //auto sprite = Sprite3D::create(filename);
+    //sprite->setScale(1.0);
+    //auto animation = Animation3D::create(filename);
+    //if (animation)
+    //{
+    //    auto animate = Animate3D::create(animation);
+        
+    //    sprite->runAction(RepeatForever::create(animate));
+    //}
+    //sprite->setPosition(Vec2(100,100));
+    auto rt = experimental::RenderTarget::create(fboSize.width, fboSize.height);
+    auto rtDS = experimental::RenderTargetDepthStencil::create(fboSize.width, fboSize.height);
+    fbo->attachRenderTarget(rt);
+    fbo->attachDepthStencilTarget(rtDS);
+    auto sprite = Sprite::createWithTexture(fbo->getRenderTarget()->getTexture());
+    sprite->setScale(0.3);
+    sprite->runAction(RepeatForever::create(RotateBy::create(1, 90)));
+    sprite->setPosition(size.width/2, size.height/2);
+    addChild(sprite);
+    
+    auto sprite2 = Sprite::create(s_pathGrossini);
+    sprite2->setPosition(Vec2(size.width/5,size.height/5));
+    addChild(sprite2);
+    sprite2->setCameraMask((unsigned short)CameraFlag::USER1);
+    auto move = MoveBy::create(1.0, Vec2(100,100));
+    sprite2->runAction(
+                       RepeatForever::create(
+                                             Sequence::createWithTwoActions(
+                                                                            move, move->reverse())
+                                             )
+                       );
+    
+    auto camera = Camera::create();
+    camera->setCameraFlag(CameraFlag::USER1);
+    camera->setDepth(-1);
+    camera->setFrameBufferObject(fbo);
+    fbo->setClearColor(Color4F(1,1,1,1));
+    addChild(camera);
 }

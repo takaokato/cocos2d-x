@@ -1,7 +1,23 @@
-
-
 #include "UILayoutTest.h"
 
+USING_NS_CC;
+using namespace cocos2d::ui;
+
+UILayoutTests::UILayoutTests()
+{
+    ADD_TEST_CASE(UILayoutTest);
+    ADD_TEST_CASE(UILayoutTest_Color);
+    ADD_TEST_CASE(UILayoutTest_Gradient);
+    ADD_TEST_CASE(UILayoutTest_BackGroundImage);
+    ADD_TEST_CASE(UILayoutTest_BackGroundImage_Scale9);
+    ADD_TEST_CASE(UILayoutTest_Layout_Linear_Vertical);
+    ADD_TEST_CASE(UILayoutTest_Layout_Linear_Horizontal);
+    ADD_TEST_CASE(UILayoutTest_Layout_Relative_Align_Parent);
+    ADD_TEST_CASE(UILayoutTest_Layout_Relative_Location);
+    ADD_TEST_CASE(UILayoutComponentTest);
+    ADD_TEST_CASE(UILayoutComponent_Berth_Test);
+    ADD_TEST_CASE(UILayoutComponent_Berth_Stretch_Test);
+}
 
 // UILayoutTest
 
@@ -345,7 +361,7 @@ bool UILayoutTest_Layout_Linear_Vertical::init()
         
         // Create the layout
         Layout* layout = Layout::create();
-        layout->setLayoutType(LayoutType::VERTICAL);
+        layout->setLayoutType(Layout::Type::VERTICAL);
         layout->setContentSize(Size(280, 150));
         Size backgroundSize = background->getContentSize();
         layout->setPosition(Vec2((widgetSize.width - backgroundSize.width) / 2.0f +
@@ -419,7 +435,7 @@ bool UILayoutTest_Layout_Linear_Horizontal::init()
         
         // Create the layout
         Layout* layout = Layout::create();
-        layout->setLayoutType(LayoutType::HORIZONTAL);
+        layout->setLayoutType(Layout::Type::HORIZONTAL);
         layout->setClippingEnabled(true);
         layout->setContentSize(Size(280, 150));
         Size backgroundSize = background->getContentSize();
@@ -493,7 +509,7 @@ bool UILayoutTest_Layout_Relative_Align_Parent::init()
         
         // Create the layout
         Layout* layout = Layout::create();
-        layout->setLayoutType(LayoutType::RELATIVE);
+        layout->setLayoutType(Layout::Type::RELATIVE);
         layout->setContentSize(Size(280, 150));
         layout->setBackGroundColorType(Layout::BackGroundColorType::SOLID);
         layout->setBackGroundColor(Color3B::GREEN);
@@ -628,7 +644,7 @@ bool UILayoutTest_Layout_Relative_Location::init()
         
         // Create the layout
         Layout* layout = Layout::create();
-        layout->setLayoutType(LayoutType::RELATIVE);
+        layout->setLayoutType(Layout::Type::RELATIVE);
         layout->setContentSize(Size(280, 150));
         Size backgroundSize = background->getContentSize();
         layout->setPosition(Vec2((widgetSize.width - backgroundSize.width) / 2.0f +
@@ -738,7 +754,7 @@ void UILayoutComponentTest::touchEvent(Ref *pSender, Widget::TouchEventType type
                 _baseLayer->setContentSize(Size(200, 200));
             else
                 _baseLayer->setContentSize(widgetSize);
-            ui:Helper::doLayout(_baseLayer);
+            Helper::doLayout(_baseLayer);
          }
         break;
 
@@ -843,4 +859,3 @@ bool UILayoutComponent_Berth_Stretch_Test::init()
     }
     return false;
 }
-

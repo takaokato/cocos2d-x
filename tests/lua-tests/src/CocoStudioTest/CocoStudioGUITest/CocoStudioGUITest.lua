@@ -29,9 +29,6 @@ function UIScene:init()
 
     self._sceneTitle = root:getChildByName("UItest")
 
-    local back_label = root:getChildByName("back")--getWidgetByName
-    back_label:setVisible(false)
-
     local function previousCallback(sender, eventType)
         if eventType == ccui.TouchEventType.ended then
             cc.Director:getInstance():replaceScene(guiSceneManager.previousUIScene())
@@ -711,9 +708,6 @@ function UILoadingBarLeftTest:initExtend()
     local root = self._uiLayer:getChildByTag(81)
     self._sceneTitle = root:getChildByName("UItest")
 
-    local back_label = root:getChildByName("back")
-    back_label:setVisible(false)
-
     local widgetSize = self._widget:getContentSize()
         
     local alert = ccui.Text:create()
@@ -836,9 +830,6 @@ function UILoadingBarRightTest:initExtend()
 
     local root = self._uiLayer:getChildByTag(81)
     self._sceneTitle = root:getChildByName("UItest")
-
-    local back_label = root:getChildByName("back")
-    back_label:setVisible(false)
 
     local widgetSize = self._widget:getContentSize()
         
@@ -963,9 +954,6 @@ function UILoadingBarLeftScale9Test:initExtend()
 
     local root = self._uiLayer:getChildByTag(81)
     self._sceneTitle = root:getChildByName("UItest")
-
-    local back_label = root:getChildByName("back")
-    back_label:setVisible(false)
 
     local widgetSize = self._widget:getContentSize()
         
@@ -1092,9 +1080,6 @@ function UILoadingBarRightScale9Test:initExtend()
 
     local root = self._uiLayer:getChildByTag(81)
     self._sceneTitle = root:getChildByName("UItest")
-
-    local back_label = root:getChildByName("back")
-    back_label:setVisible(false)
 
     local widgetSize = self._widget:getContentSize()
         
@@ -1226,7 +1211,12 @@ function UILabelAtlasTest:initExtend()
         
 
     local labelAtlas = ccui.TextAtlas:create()
-    labelAtlas:setProperty("1234567890", "cocosui/labelatlas.png", 17, 22, "0")
+    if cc.Director:getInstance():getWinSizeInPixels().height > 320 then
+        labelAtlas:setProperty("1234567890", "cocosui/labelatlas.png", 34, 44, "0")
+    else
+        labelAtlas:setProperty("1234567890", "cocosui/labelatlas.png", 17, 22, "0")
+    end
+    
     labelAtlas:setPosition(cc.p((widgetSize.width) / 2, widgetSize.height / 2.0))        
         
     self._uiLayer:addChild(labelAtlas) 
@@ -1405,12 +1395,12 @@ function UITextFieldTest:initExtend()
         if eventType == ccui.TextFiledEventType.attach_with_ime then
             local textField = sender
             local screenSize = cc.Director:getInstance():getWinSize()
-            textField:runAction(cc.MoveTo:create(0.225,cc.p(screenSize.width / 2.0, screenSize.height / 2.0 + textField:getContentSize().height / 2.0)))
+            textField:runAction(cc.MoveBy:create(0.225,cc.p(0, textField:getContentSize().height / 2.0)))
             self._displayValueLabel:setString("attach with IME")
         elseif eventType == ccui.TextFiledEventType.detach_with_ime then
             local textField = sender
             local screenSize = cc.Director:getInstance():getWinSize()
-            textField:runAction(cc.MoveTo:create(0.175, cc.p(screenSize.width / 2.0, screenSize.height / 2.0)))
+            textField:runAction(cc.MoveBy:create(0.175, cc.p(0, textField:getContentSize().height / -2.0)))
             self._displayValueLabel:setString("detach with IME")
         elseif eventType == ccui.TextFiledEventType.insert_text then
             self._displayValueLabel:setString("insert words")
@@ -4032,6 +4022,78 @@ function UIFocusTestNestedLayout3.create()
     return scene   
 end
 
+local UIS9NinePatchTest = class("UIS9NinePatchTest",UIScene)
+
+function UIS9NinePatchTest.extend(target)
+    local t = tolua.getpeer(target)
+    if not t then
+        t = {}
+        tolua.setpeer(target, t)
+    end
+    setmetatable(t, UIS9NinePatchTest)
+    return target
+end
+
+function UIS9NinePatchTest:initExtend()
+    self:init()
+    
+    local widgetSize = self._widget:getContentSize()
+    self._displayValueLabel = ccui.Text:create()
+    self._displayValueLabel:setString("UIS9NinePatchTest")
+    self._displayValueLabel:setFontName(font_TextName)
+    self._displayValueLabel:setFontSize(32)
+    self._displayValueLabel:setAnchorPoint(cc.p(0.5, -1))
+    self._displayValueLabel:setPosition(cc.p(widgetSize.width / 2.0, widgetSize.height / 2.0 + self._displayValueLabel:getContentSize().height * 1.8))
+    self._uiLayer:addChild(self._displayValueLabel)
+
+    cc.SpriteFrameCache:getInstance():addSpriteFrames("cocosui/android9patch.plist")
+
+    local winSize = cc.Director:getInstance():getWinSize()
+    local x = winSize.width / 2
+    local y = 0 + (winSize.height / 2 + 50)
+
+    local preferedSize = cc.size(99,99)
+
+    --9-patch sprite with filename
+    local playerSprite = ccui.Scale9Sprite:create("cocosui/player.9.png")
+    playerSprite:setPosition(x, y)
+    playerSprite:setContentSize(preferedSize)
+    local capInsets = playerSprite:getCapInsets()
+    print(string.format("player sprite capInset = %f, %f %f, %f", capInsets.x,
+          capInsets.y, capInsets.width, capInsets.height))
+    self:addChild(playerSprite)
+
+    local animationBtnSprite = ccui.Scale9Sprite:createWithSpriteFrameName("animationbuttonpressed.png")
+    animationBtnSprite:setPosition(x-100, y-100)
+    capInsets = animationBtnSprite:getCapInsets()
+    print(string.format("animationBtnSprite capInset = %f, %f %f, %f", capInsets.x,
+          capInsets.y, capInsets.width, capInsets.height))
+    self:addChild(animationBtnSprite)
+    
+    
+    local monsterSprite = ccui.Scale9Sprite:createWithSpriteFrameName("monster.9.png")
+    monsterSprite:setPosition(x+100, y-100)
+    capInsets = monsterSprite:getCapInsets()
+    monsterSprite:setContentSize(preferedSize)
+    print(string.format("monsterSprite capInset = %f, %f %f, %f", capInsets.x,
+          capInsets.y, capInsets.width, capInsets.height))
+    self:addChild(monsterSprite)
+
+    local spriteFrame = cc.SpriteFrameCache:getInstance():getSpriteFrame("buttonnormal.9.png")
+    local buttonScale9Sprite = ccui.Scale9Sprite:createWithSpriteFrame(spriteFrame)
+    buttonScale9Sprite:setContentSize(cc.size(150,80))
+    buttonScale9Sprite:setPosition(cc.p(100,200))
+    self:addChild(buttonScale9Sprite)
+end
+
+function UIS9NinePatchTest.create()
+    local scene = cc.Scene:create()
+    local layer = UIS9NinePatchTest.extend(cc.Layer:create())
+    layer:initExtend()
+    scene:addChild(layer)
+    return scene   
+end
+
 local cocoStudioGuiArray = 
 {
     {
@@ -4339,6 +4401,12 @@ local cocoStudioGuiArray =
         title = "UIRichTextTest",
         func  = function()
             return UIRichTextTest.create()
+        end
+    },
+    {
+        title = "UIS9NinePatchTest",
+        func  = function()
+            return UIS9NinePatchTest.create()
         end
     },
 }

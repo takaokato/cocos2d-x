@@ -223,10 +223,9 @@ function Camera3DTestDemo:onEnter()
             if self._camera ~= nil and self._sprite3D ~= nil and self._cameraType == CameraType.ThirdCamera then
                 local nearP = cc.vec3(location.x, location.y, -1.0)
                 local farP  = cc.vec3(location.x, location.y, 1.0)
-                
-                local size = cc.Director:getInstance():getWinSize()
-                nearP = self._camera:unproject(size, nearP, nearP)
-                farP  = self._camera:unproject(size, farP, farP)
+
+                nearP = self._camera:unproject(nearP)
+                farP  = self._camera:unproject(farP)
                 local dir = cc.vec3(farP.x - nearP.x, farP.y - nearP.y, farP.z - nearP.z)
                 local dist=0.0
                 local ndd = dir.x * 0 + dir.y * 1 + dir.z * 0
@@ -1036,8 +1035,8 @@ end
 function CameraArcBallDemo:updateCameraTransform()
     -- body
     local trans = cc.mat4.createTranslation(cc.vec3(0.0, 10.0, self._distanceZ), cc.mat4.createIdentity())
-    local rot = cc.mat4.createRotation(self._rotationQuat, cc.mat4.createIdentity())
-    local center = cc.mat4.createTranslation(self._center, cc.mat4.createIdentity())
+    local rot = cc.mat4.new(cc.mat4.createRotation(self._rotationQuat, cc.mat4.createIdentity()))
+    local center = cc.mat4.new(cc.mat4.createTranslation(self._center, cc.mat4.createIdentity()))
     local result = cc.mat4.new(center:multiply(rot)):multiply(trans)
 
     self._camera:setNodeToParentTransform(result)

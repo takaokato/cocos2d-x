@@ -26,6 +26,8 @@
 #include "CocosStudio3DTest.h"
 #include "cocostudio/CocoStudio.h"
 
+USING_NS_CC;
+
 enum
 {
     IDC_NEXT = 100,
@@ -33,40 +35,14 @@ enum
     IDC_RESTART
 };
 
-static int sceneIdx = -1;
-
-
-static std::function<Layer*()> createFunctions[] =
+CocosStudio3DTests::CocosStudio3DTests()
 {
-    CL(CSNode3DTest)
-};
-
-#define MAX_LAYER    (sizeof(createFunctions) / sizeof(createFunctions[0]))
-
-static Layer* nextCocosStudio3DTestAction()
-{
-    sceneIdx++;
-    sceneIdx = sceneIdx % MAX_LAYER;
-    
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
-}
-
-static Layer* backCocosStudio3DTestAction()
-{
-    sceneIdx--;
-    int total = MAX_LAYER;
-    if( sceneIdx < 0 )
-        sceneIdx += total;
-    
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
-}
-
-static Layer* restartCocosStudio3DTestAction()
-{
-    auto layer = (createFunctions[sceneIdx])();
-    return layer;
+    FileUtils::getInstance()->addSearchPath("ccs-res/CocosStudio3DTest");
+    ADD_TEST_CASE(CSNode3DTest);
+    ADD_TEST_CASE(CSSprite3DTest);
+    ADD_TEST_CASE(CSUserCameraTest);
+    ADD_TEST_CASE(CSParticle3DTest);
+    ADD_TEST_CASE(CSSceneSkyBoxTest);
 }
 
 //------------------------------------------------------------------
@@ -76,7 +52,6 @@ static Layer* restartCocosStudio3DTestAction()
 //------------------------------------------------------------------
 
 CocosStudio3DTestDemo::CocosStudio3DTestDemo(void)
-: BaseTest()
 {
 }
 
@@ -89,39 +64,10 @@ std::string CocosStudio3DTestDemo::title() const
     return "No title";
 }
 
-std::string CocosStudio3DTestDemo::subtitle() const
+void CocosStudio3DTestDemo::onExit()
 {
-    return "";
-}
-
-void CocosStudio3DTestDemo::onEnter()
-{
-    BaseTest::onEnter();
-}
-
-void CocosStudio3DTestDemo::restartCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) CS3DTestScene();
-    s->addChild(restartCocosStudio3DTestAction());
-    
-    Director::getInstance()->replaceScene(s);
-    s->release();
-}
-
-void CocosStudio3DTestDemo::nextCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) CS3DTestScene();
-    s->addChild( nextCocosStudio3DTestAction() );
-    Director::getInstance()->replaceScene(s);
-    s->release();
-}
-
-void CocosStudio3DTestDemo::backCallback(Ref* sender)
-{
-    auto s = new (std::nothrow) CS3DTestScene();
-    s->addChild( backCocosStudio3DTestAction() );
-    Director::getInstance()->replaceScene(s);
-    s->release();
+    cocostudio::destroyCocosStudio();
+    TestCase::onExit();
 }
 
 //------------------------------------------------------------------
@@ -131,35 +77,119 @@ void CocosStudio3DTestDemo::backCallback(Ref* sender)
 //------------------------------------------------------------------
 CSNode3DTest::CSNode3DTest()
 {
-    auto node = CSLoader::createNode("CocosStudio3DTest/Node3D.csb");
+    auto node = CSLoader::createNode("Node3D.csb");
+
+    auto size = Director::getInstance()->getWinSize();
+    auto label = Label::create();
+    label->setString(std::string("Function demo, no content to show"));
+    label->setPosition(size.width / 2, size.height / 2);
+    label->setTextColor(Color4B::ORANGE);
+    node->addChild(label);
 
     addChild(node);
 }
 
 std::string CSNode3DTest::title() const
 {
-    return "CocosStudio Node3D Test";
-}
-
-std::string CSNode3DTest::subtitle() const
-{
-    return "CCNode in 3D space";
+    return "Node3DReader Test";
 }
 
 //------------------------------------------------------------------
 //
-// CS3DTestScene
+// CSSprite3DTest
 //
 //------------------------------------------------------------------
-void CS3DTestScene::runThisTest()
+CSSprite3DTest::CSSprite3DTest()
 {
-    auto layer = nextCocosStudio3DTestAction();
-    addChild(layer);
-        
-    Director::getInstance()->replaceScene(this);
+    auto node = CSLoader::createNode("Sprite3D.csb");
+    
+    auto size = Director::getInstance()->getWinSize();
+    auto sprite3D = node->getChildByTag(8);
+    
+    sprite3D->setPosition(size.width / 2, size.height / 2 - 50);
+    sprite3D->setColor(Color3B::WHITE);
+    sprite3D->setOpacity(255);
+    
+    addChild(node);
 }
-                   
-CS3DTestScene::CS3DTestScene()
+
+std::string CSSprite3DTest::title() const
 {
-        
+    return "Sprite3DReader Test";
+}
+
+//------------------------------------------------------------------
+//
+// CSUserCameraTest
+//
+//------------------------------------------------------------------
+CSUserCameraTest::CSUserCameraTest()
+{
+    auto node = CSLoader::createNode("UserCamera.csb");
+    
+    auto sprite3D = Sprite3D::create("dragon/dragon.c3b");
+    sprite3D->setPosition3D(Vec3(100, 95, 80));
+    sprite3D->setCameraMask((unsigned int)CameraFlag::USER1);
+    
+    addChild(node);
+    addChild(sprite3D);
+}
+
+std::string CSUserCameraTest::title() const
+{
+    return "UserCameraReader Test";
+}
+
+//------------------------------------------------------------------
+//
+// CSParticle3DTest
+//
+//------------------------------------------------------------------
+CSParticle3DTest::CSParticle3DTest()
+{
+    auto node = CSLoader::createNode("Particle3D.csb");
+    
+    addChild(node);
+}
+
+std::string CSParticle3DTest::title() const
+{
+    return "Particle3DReader Test";
+}
+
+//------------------------------------------------------------------
+//
+// CSSceneSkyBoxTest
+//
+//------------------------------------------------------------------
+CSSceneSkyBoxTest::CSSceneSkyBoxTest()
+{
+    auto node = CSLoader::createNode("SkyBox.csb");
+
+    addChild(node);
+
+    _camera = static_cast<Camera*>(node->getChildByName("UserCamera_0"));
+
+    auto listener = EventListenerTouchAllAtOnce::create();
+    listener->onTouchesMoved = CC_CALLBACK_2(CSSceneSkyBoxTest::onTouchesMoved, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
+}
+
+std::string CSSceneSkyBoxTest::title() const
+{
+    return "CocosStudio SkyBox Test";
+}
+
+void CSSceneSkyBoxTest::onTouchesMoved(const std::vector<Touch*>& touches, cocos2d::Event  *event)
+{
+    if (touches.size())
+    {
+        auto touch = touches[0];
+        auto delta = touch->getDelta();
+
+        static float _angle = 0.f;
+        _angle -= CC_DEGREES_TO_RADIANS(delta.x);
+        _camera->setPosition3D(Vec3(50.0f * sinf(_angle), 0.0f, 50.0f * cosf(_angle)));
+        _camera->lookAt(Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+    }
 }

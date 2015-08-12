@@ -33,36 +33,7 @@
 #include "extensions/ExtensionMacros.h"
 #include "UIEditBoxImpl.h"
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-
-@interface UICustomUITextField : UITextField
-{
-}
-
-@end
-
-
-@interface UIEditBoxImplIOS_objc : NSObject <UITextFieldDelegate>
-{
-    UICustomUITextField* textField_;
-    void* editBox_;
-    BOOL editState_;
-}
-
-@property(nonatomic, retain) UITextField* textField;
-@property(nonatomic, readonly, getter = isEditState) BOOL editState;
-@property(nonatomic, assign) void* editBox;
-
--(id) initWithFrame: (CGRect) frameRect editBox: (void*) editBox;
--(void) doAnimationWhenKeyboardMoveWithDuration:(float)duration distance:(float)distance;
--(void) setPosition:(CGPoint) pos;
--(void) setContentSize:(CGSize) size;
--(void) visit;
--(void) openKeyboard;
--(void) closeKeyboard;
-
-@end
+@class UIEditBoxImplIOS_objc;
 
 NS_CC_BEGIN
 
@@ -85,9 +56,9 @@ public:
     
     virtual bool initWithSize(const Size& size);
     virtual void setFont(const char* pFontName, int fontSize);
-    virtual void setFontColor(const Color3B& color);
+    virtual void setFontColor(const Color4B& color);
     virtual void setPlaceholderFont(const char* pFontName, int fontSize);
-    virtual void setPlaceholderFontColor(const Color3B& color);
+    virtual void setPlaceholderFontColor(const Color4B& color);
     virtual void setInputMode(EditBox::InputMode inputMode);
     virtual void setInputFlag(EditBox::InputFlag inputFlag);
     virtual void setMaxLength(int maxLength);
@@ -108,7 +79,7 @@ public:
      * @js NA
      * @lua NA
      */
-    virtual void visit(void);
+    virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags)override;
     /**
      * @js NA
      * @lua NA
@@ -124,6 +95,7 @@ private:
 	void			setInactiveText(const char* pText);
 	void			adjustTextFieldPosition();
     void            placeInactiveLabels();
+    UIFont*         constructFont(const char* fontName, int fontSize);
 	
     Label*     _label;
     Label*     _labelPlaceHolder;

@@ -25,28 +25,20 @@
 #ifndef _COCOSSTUDIO3D_TEST_H_
 #define _COCOSSTUDIO3D_TEST_H_
 
-#include "../testBasic.h"
 #include "../BaseTest.h"
 #include <string>
 
-namespace cocos2d {
+DEFINE_TEST_SUITE(CocosStudio3DTests);
 
-}
-
-class CocosStudio3DTestDemo : public BaseTest
+class CocosStudio3DTestDemo : public TestCase
 {
 public:
     CocosStudio3DTestDemo(void);
     virtual ~CocosStudio3DTestDemo(void);
     
-    void restartCallback(Ref* sender);
-    void nextCallback(Ref* sender);
-    void backCallback(Ref* sender);
-    
     // overrides
     virtual std::string title() const override;
-    virtual std::string subtitle() const override;
-    virtual void onEnter() override;
+    virtual void onExit() override;
 };
 
 class CSNode3DTest : public CocosStudio3DTestDemo
@@ -55,14 +47,42 @@ public:
     CREATE_FUNC(CSNode3DTest);
     CSNode3DTest();
     virtual std::string title() const override;
-    virtual std::string subtitle() const override;
 };
 
-class CS3DTestScene : public TestScene
+class CSSprite3DTest : public CocosStudio3DTestDemo
 {
 public:
-    CS3DTestScene();
-    virtual void runThisTest();
+    CREATE_FUNC(CSSprite3DTest);
+    CSSprite3DTest();
+    virtual std::string title() const override;
 };
+
+class CSUserCameraTest : public CocosStudio3DTestDemo
+{
+public:
+    CREATE_FUNC(CSUserCameraTest);
+    CSUserCameraTest();
+    virtual std::string title() const override;
+};
+
+class CSParticle3DTest : public CocosStudio3DTestDemo
+{
+public:
+    CREATE_FUNC(CSParticle3DTest);
+    CSParticle3DTest();
+    virtual std::string title() const override;
+};
+
+class CSSceneSkyBoxTest : public CocosStudio3DTestDemo
+{
+private:
+    cocos2d::Camera *_camera;
+public:
+    CREATE_FUNC(CSSceneSkyBoxTest);
+    CSSceneSkyBoxTest();
+    virtual std::string title() const override;
+    void onTouchesMoved(const std::vector<cocos2d::Touch*>& touches, cocos2d::Event  *event);
+};
+
 
 #endif
