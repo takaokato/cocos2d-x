@@ -552,8 +552,10 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 	{
 		glEnable(GL_DEPTH_TEST);
 		glDepthMask(GL_TRUE);
+		glDepthFunc(GL_LESS);
         RenderState::StateBlock::_defaultState->setDepthTest(true);
         RenderState::StateBlock::_defaultState->setDepthWrite(true);
+		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LESS);
 
 		for (auto it = zOpaque2DQueue.rbegin(); it != zOpaque2DQueue.rend(); ++it)
 		{
@@ -571,8 +573,10 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         //Clear depth to achieve layered rendering
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
+		glDepthFunc(GL_LESS);
+		RenderState::StateBlock::_defaultState->setDepthTest(true);
         RenderState::StateBlock::_defaultState->setDepthWrite(true);
+		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LESS);
 
         for (auto it = opaqueQueue.cbegin(); it != opaqueQueue.cend(); ++it)
         {
@@ -591,8 +595,10 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 		{
 			glEnable(GL_DEPTH_TEST);
 			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LEQUAL);
 			RenderState::StateBlock::_defaultState->setDepthTest(true);
 			RenderState::StateBlock::_defaultState->setDepthWrite(true);
+			RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LEQUAL);
 		}
 		else
 		{
@@ -616,9 +622,11 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
     {
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
+		glDepthFunc(GL_LEQUAL);
 
         RenderState::StateBlock::_defaultState->setDepthTest(true);
         RenderState::StateBlock::_defaultState->setDepthWrite(false);
+		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LEQUAL);
 
 
         for (auto it = transQueue.cbegin(); it != transQueue.cend(); ++it)
@@ -638,10 +646,12 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         {
             glEnable(GL_DEPTH_TEST);
             glDepthMask(GL_FALSE);
+			glDepthFunc(GL_LEQUAL);
 
             RenderState::StateBlock::_defaultState->setDepthTest(true);
             RenderState::StateBlock::_defaultState->setDepthWrite(false);
-        }
+			RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LEQUAL);
+		}
         else
         {
             glDisable(GL_DEPTH_TEST);
