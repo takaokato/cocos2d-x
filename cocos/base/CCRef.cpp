@@ -30,6 +30,7 @@ THE SOFTWARE.
 
 #if CC_REF_LEAK_DETECTION
 #include <algorithm>    // std::find
+#include <mutex>
 #endif
 
 NS_CC_BEGIN
@@ -148,9 +149,32 @@ unsigned int Ref::getReferenceCount() const
 #if CC_REF_LEAK_DETECTION
 
 static std::list<Ref*> __refAllocationList;
+static std::mutex* __mutex = nullptr;
+
+void Ref::initObjectListMutex()
+{
+	static std::mutex mutex;
+	__mutex = &mutex;
+}
+
+const std::list<Ref*>& Ref::lockObjectList()
+{
+	if (__mutex == nullptr) {
+		initObjectListMutex();
+	}
+	__mutex->lock();
+	return __refAllocationList;
+}
+
+void Ref::unlockObjectList()
+{
+	__mutex->unlock();
+}
 
 void Ref::printLeaks()
 {
+	std::mutex* mutex = __mutex;
+	if (mutex) mutex->lock();
     // Dump Ref object memory leaks
     if (__refAllocationList.empty())
     {
@@ -167,6 +191,7 @@ void Ref::printLeaks()
             log("[memory] LEAK: Ref object '%s' still active with reference count %d.\n", (type ? type : ""), ref->getReferenceCount());
         }
     }
+	if (mutex) mutex->unlock();
 }
 
 size_t Ref::getObjectCount()
@@ -174,29 +199,31 @@ size_t Ref::getObjectCount()
 	return __refAllocationList.size();
 }
 
-const std::list<Ref*>& Ref::getObjectList()
-{
-	return __refAllocationList;
-}
-
 static void trackRef(Ref* ref)
 {
     CCASSERT(ref, "Invalid parameter, ref should not be null!");
 
     // Create memory allocation record.
-    __refAllocationList.push_back(ref);
+	std::mutex* mutex = __mutex;
+	if (mutex) mutex->lock();
+	__refAllocationList.push_back(ref);
+	if (mutex) mutex->unlock();
 }
 
 static void untrackRef(Ref* ref)
 {
-    auto iter = std::find(__refAllocationList.begin(), __refAllocationList.end(), ref);
+	std::mutex* mutex = __mutex;
+	if (mutex) mutex->lock();
+	auto iter = std::find(__refAllocationList.begin(), __refAllocationList.end(), ref);
     if (iter == __refAllocationList.end())
     {
+		if (mutex) mutex->unlock();
         log("[memory] CORRUPTION: Attempting to free (%s) with invalid ref tracking record.\n", typeid(*ref).name());
         return;
     }
 
     __refAllocationList.erase(iter);
+	if (mutex) mutex->unlock();
 }
 
 #endif // #if CC_REF_LEAK_DETECTION

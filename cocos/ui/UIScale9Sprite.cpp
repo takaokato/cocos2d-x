@@ -1661,7 +1661,7 @@ namespace ui {
     {
         this->setScaleX(scale);
         this->setScaleY(scale);
-        this->setScaleZ(scale);
+        //this->setScaleZ(scale);
     }
 
     void Scale9Sprite::setScale(float scaleX, float scaleY)

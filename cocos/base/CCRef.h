@@ -172,7 +172,9 @@ public:
 public:
     static void printLeaks();
 	static size_t getObjectCount();
-	static const std::list<Ref*>& getObjectList();
+	static void initObjectListMutex();
+	static const std::list<Ref*>& lockObjectList();
+	static void unlockObjectList();
 #endif
 };
 

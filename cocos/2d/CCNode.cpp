@@ -485,10 +485,10 @@ float Node::getScale(void) const
 /// scale setter
 void Node::setScale(float scale)
 {
-    if (_scaleX == scale && _scaleY == scale && _scaleZ == scale)
+    if (_scaleX == scale && _scaleY == scale/* && _scaleZ == scale*/)
         return;
     
-    _scaleX = _scaleY = _scaleZ = scale;
+    _scaleX = _scaleY /*= _scaleZ*/ = scale;
     _transformUpdated = _transformDirty = _inverseDirty = true;
 #if CC_USE_PHYSICS
     if (_physicsWorld && _physicsBodyAssociatedWith > 0)

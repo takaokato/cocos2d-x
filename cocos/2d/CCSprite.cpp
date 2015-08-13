@@ -894,7 +894,7 @@ void Sprite::setScaleY(float scaleY)
 
 void Sprite::setScale(float fScale)
 {
-    Node::setScale(fScale);
+    Node::setScale(fScale, fScale);
     SET_DIRTY_RECURSIVELY();
 }
 

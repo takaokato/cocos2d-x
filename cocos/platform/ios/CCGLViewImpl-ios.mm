@@ -102,6 +102,8 @@ void GLViewImpl::convertAttrs()
     } else if (_glContextAttrs.depthBits==0 && _glContextAttrs.stencilBits==0)
     {
         _depthFormat = 0;
+    } else if (_glContextAttrs.depthBits==16 && _glContextAttrs.stencilBits==0) {
+        _depthFormat = GL_DEPTH_COMPONENT16;
     } else
     {
         CCASSERT(0, "Unsupported format for depth and stencil buffers. Using default");

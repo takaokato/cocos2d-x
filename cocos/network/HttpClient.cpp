@@ -180,11 +180,11 @@ void HttpClient::networkThreadAloneUnsafe(HttpRequest* request)
 
 	if (callback != nullptr)
 	{
-		callback(s_pHttpClient, response);
+		callback(this, response);
 	}
 	else if (pTarget && pSelector)
 	{
-		(pTarget->*pSelector)(s_pHttpClient, response);
+		(pTarget->*pSelector)(this, response);
 	}
 	response->release();
 	request->release();

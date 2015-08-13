@@ -104,7 +104,12 @@ void QuadCommand::useMaterial() const
     GL::bindTexture2D(_textureID);
     
     //set blend mode
-    GL::blendFunc(_blendType.src, _blendType.dst);
+    if (isTransparent()) {
+	    GL::blendFunc(_blendType.src, _blendType.dst);
+    }
+    else {
+        GL::blendFunc(GL_ONE, GL_ZERO);
+    }
     
     _glProgramState->applyGLProgram(_mv);
     _glProgramState->applyUniforms();
