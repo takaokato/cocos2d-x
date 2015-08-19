@@ -513,8 +513,11 @@ void Renderer::processRenderCommand(RenderCommand* command)
     else if(RenderCommand::Type::GROUP_COMMAND == commandType)
     {
         flush();
-        int renderQueueID = ((GroupCommand*) command)->getRenderQueueID();
+        GroupCommand* groupCommand = (GroupCommand*)command;
+        int renderQueueID = groupCommand->getRenderQueueID();
+        groupCommand->onBegin();
         visitRenderQueue(_renderGroups[renderQueueID]);
+        groupCommand->onEnd();
     }
     else if(RenderCommand::Type::CUSTOM_COMMAND == commandType)
     {
@@ -550,17 +553,30 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 	const auto& zOpaque2DQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::OPAQUE_2D);
 	if (zOpaque2DQueue.size() > 0)
 	{
-		glEnable(GL_DEPTH_TEST);
-		glDepthMask(GL_TRUE);
-		glDepthFunc(GL_LESS);
-        RenderState::StateBlock::_defaultState->setDepthTest(true);
-        RenderState::StateBlock::_defaultState->setDepthWrite(true);
-		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LESS);
-
-		for (auto it = zOpaque2DQueue.rbegin(); it != zOpaque2DQueue.rend(); ++it)
-		{
-			processRenderCommand(*it);
-		}
+        if(_isDepthTestFor2D)
+        {
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(GL_TRUE);
+			glDepthFunc(GL_LESS);
+	        RenderState::StateBlock::_defaultState->setDepthTest(true);
+	        RenderState::StateBlock::_defaultState->setDepthWrite(true);
+			RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LESS);
+            for (auto it = zOpaque2DQueue.rbegin(); it != zOpaque2DQueue.rend(); ++it)
+            {
+                processRenderCommand(*it);
+            }
+        }
+        else
+        {
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(GL_FALSE);
+            RenderState::StateBlock::_defaultState->setDepthTest(false);
+            RenderState::StateBlock::_defaultState->setDepthWrite(false);
+            for (auto it = zOpaque2DQueue.cbegin(); it != zOpaque2DQueue.cend(); ++it)
+            {
+                processRenderCommand(*it);
+            }
+        }
 		flush();
 	}
 	

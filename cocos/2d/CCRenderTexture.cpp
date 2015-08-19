@@ -336,45 +336,6 @@ void RenderTexture::beginWithClear(float r, float g, float b, float a, float dep
     setClearFlags(flags);
 
     this->begin();
-
-    //clear screen
-    _beginWithClearCommand.init(_globalZOrder);
-    _beginWithClearCommand.func = CC_CALLBACK_0(RenderTexture::onClear, this);
-    Director::getInstance()->getRenderer()->addCommand(&_beginWithClearCommand);
-}
-
-//TODO: find a better way to clear the screen, there is no need to rebind render buffer there.
-void RenderTexture::clear(float r, float g, float b, float a)
-{
-    this->beginWithClear(r, g, b, a);
-    this->end();
-}
-
-void RenderTexture::clearDepth(float depthValue)
-{
-    setClearDepth(depthValue);
-
-    this->begin();
-
-    _clearDepthCommand.init(_globalZOrder);
-    _clearDepthCommand.func = CC_CALLBACK_0(RenderTexture::onClearDepth, this);
-
-    Director::getInstance()->getRenderer()->addCommand(&_clearDepthCommand);
-
-    this->end();
-}
-
-void RenderTexture::clearStencil(int stencilValue)
-{
-    // save old stencil value
-    int stencilClearValue;
-    glGetIntegerv(GL_STENCIL_CLEAR_VALUE, &stencilClearValue);
-
-    glClearStencil(stencilValue);
-    glClear(GL_STENCIL_BUFFER_BIT);
-
-    // restore clear color
-    glClearStencil(stencilClearValue);
 }
 
 void RenderTexture::visit(Renderer *renderer, const Mat4 &parentTransform, uint32_t parentFlags)
@@ -559,7 +520,7 @@ void RenderTexture::onBegin()
         float heightRatio = size.height / texSize.height;
         
         Mat4 orthoMatrix;
-        Mat4::createOrthographicOffCenter((float)-1.0 / widthRatio, (float)1.0 / widthRatio, (float)-1.0 / heightRatio, (float)1.0 / heightRatio, -1, 1, &orthoMatrix);
+        Mat4::createScale(widthRatio, heightRatio, 1.0f, &orthoMatrix);
         director->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, orthoMatrix);
     }
     
@@ -591,6 +552,10 @@ void RenderTexture::onBegin()
         CHECK_GL_ERROR_DEBUG();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _texture->getName(), 0);
+    }
+
+    if (_clearFlags) {
+        onClear();
     }
 }
 
@@ -674,11 +639,6 @@ void RenderTexture::draw(Renderer *renderer, const Mat4 &transform, uint32_t fla
         //Begin will create a render group using new render target
         begin();
 
-        //clear screen
-        _clearCommand.init(_globalZOrder);
-        _clearCommand.func = CC_CALLBACK_0(RenderTexture::onClear, this);
-        renderer->addCommand(&_clearCommand);
-
         //! make sure all children are drawn
         sortAllChildren();
 
@@ -717,34 +677,27 @@ void RenderTexture::begin()
         float heightRatio = size.height / texSize.height;
         
         Mat4 orthoMatrix;
-        Mat4::createOrthographicOffCenter((float)-1.0 / widthRatio, (float)1.0 / widthRatio, (float)-1.0 / heightRatio, (float)1.0 / heightRatio, -1, 1, &orthoMatrix);
+        Mat4::createScale(widthRatio, heightRatio, 1.0f, &orthoMatrix);
         director->multiplyMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION, orthoMatrix);
     }
 
     _groupCommand.init(_globalZOrder);
+    _groupCommand.setOnBeginCallback(CC_CALLBACK_0(RenderTexture::onBegin, this));
+    _groupCommand.setOnEndCallback(CC_CALLBACK_0(RenderTexture::onEnd, this));
 
     Renderer *renderer =  Director::getInstance()->getRenderer();
     renderer->addCommand(&_groupCommand);
     renderer->pushGroup(_groupCommand.getRenderQueueID());
-
-    _beginCommand.init(_globalZOrder);
-    _beginCommand.func = CC_CALLBACK_0(RenderTexture::onBegin, this);
-
-    Director::getInstance()->getRenderer()->addCommand(&_beginCommand);
 }
 
 void RenderTexture::end()
 {
-    _endCommand.init(_globalZOrder);
-    _endCommand.func = CC_CALLBACK_0(RenderTexture::onEnd, this);
-
     Director* director = Director::getInstance();
     CCASSERT(nullptr != director, "Director is null when seting matrix stack");
-    
-    Renderer *renderer = director->getRenderer();
-    renderer->addCommand(&_endCommand);
+ 
+    Renderer *renderer =  Director::getInstance()->getRenderer();
     renderer->popGroup();
-    
+
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_PROJECTION);
     director->popMatrix(MATRIX_STACK_TYPE::MATRIX_STACK_MODELVIEW);
 

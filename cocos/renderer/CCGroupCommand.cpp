@@ -71,10 +71,16 @@ void GroupCommandManager::releaseGroupID(int groupID)
     _unusedIDs.push_back(groupID);
 }
 
+static void _NullFunc()
+{
+}
+
 GroupCommand::GroupCommand()
 {
     _type = RenderCommand::Type::GROUP_COMMAND;
     _renderQueueID = Director::getInstance()->getRenderer()->getGroupCommandManager()->getGroupID();
+    _onBeginGroup = &_NullFunc;
+    _onEndGroup = &_NullFunc;
 }
 
 void GroupCommand::init(float globalOrder)
@@ -83,6 +89,26 @@ void GroupCommand::init(float globalOrder)
     auto manager = Director::getInstance()->getRenderer()->getGroupCommandManager();
     manager->releaseGroupID(_renderQueueID);
     _renderQueueID = manager->getGroupID();
+}
+
+void GroupCommand::setOnBeginCallback(const std::function<void()>& onBegin)
+{
+    _onBeginGroup = onBegin;
+}
+
+void GroupCommand::setOnEndCallback(const std::function<void()>& onEnd)
+{
+    _onEndGroup = onEnd;
+}
+
+void GroupCommand::onBegin()
+{
+    _onBeginGroup();
+}
+
+void GroupCommand::onEnd()
+{
+    _onEndGroup();
 }
 
 GroupCommand::~GroupCommand()

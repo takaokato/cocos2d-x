@@ -71,12 +71,19 @@ public:
     
     /**Init function for group command*/
     void init(float globalOrder);
+    void setOnBeginCallback(const std::function<void()>& onBegin);
+    void setOnEndCallback(const std::function<void()>& onEnd);
     
     /**called by renderer, get the group ID.*/
     inline int getRenderQueueID() const {return _renderQueueID;}
+    /**called by renderer*/
+    void onBegin();
+    void onEnd();
     
 protected:
     int _renderQueueID;
+    std::function<void()> _onBeginGroup;
+    std::function<void()> _onEndGroup;
 };
 
 NS_CC_END

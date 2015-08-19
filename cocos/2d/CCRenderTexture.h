@@ -120,27 +120,6 @@ public:
 
     /** Ends grabbing. */
     virtual void end();
-
-    /** Clears the texture with a color. 
-     *
-     * @param r Red.
-     * @param g Green.
-     * @param b Blue.
-     * @param a Alpha.
-     */
-    void clear(float r, float g, float b, float a);
-
-    /** Clears the texture with a specified depth value. 
-     *
-     * @param depthValue A specified depth value.
-     */
-    virtual void clearDepth(float depthValue);
-
-    /** Clears the texture with a specified stencil value.
-     *
-     * @param stencilValue A specified stencil value.
-     */
-    virtual void clearStencil(int stencilValue);
     
     /* Creates a new Image from with the texture's data.
      * Caller is responsible for releasing it by calling delete.
@@ -348,11 +327,6 @@ protected:
     Sprite* _sprite;
     
     GroupCommand _groupCommand;
-    CustomCommand _beginWithClearCommand;
-    CustomCommand _clearDepthCommand;
-    CustomCommand _clearCommand;
-    CustomCommand _beginCommand;
-    CustomCommand _endCommand;
     /*this command is used to encapsulate saveToFile,
      call saveToFile twice will overwrite this command and callback
      and the command and callback will be executed twice.
