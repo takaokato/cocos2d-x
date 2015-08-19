@@ -182,8 +182,6 @@ xcopy /Y /Q "$(ProjectDir)..\..\external\chipmunk\prebuilt\win32\release-lib\*.*
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\Extensions\ImageExtension.cpp" />
-    <ClCompile Include="..\..\..\Extensions\SpriteFrameCacheExtension.cpp" />
     <ClCompile Include="..\..\extensions\assets-manager\AssetsManager.cpp" />
     <ClCompile Include="..\..\extensions\assets-manager\AssetsManagerEx.cpp" />
     <ClCompile Include="..\..\extensions\assets-manager\CCEventAssetsManagerEx.cpp" />

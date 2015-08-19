@@ -42,6 +42,13 @@ THE SOFTWARE.
     ((unsigned)((unsigned char)(vb) * ((unsigned char)(va) + 1) >> 8) << 16) | \
     ((unsigned)(unsigned char)(va) << 24))
 
+// nyahoon extension
+namespace l {
+    namespace io {
+        class IOutputStream;
+    }
+}
+
 NS_CC_BEGIN
 
 /**
@@ -144,6 +151,8 @@ public:
      */
     bool saveToFile(const std::string &filename, bool isToRGB = true);
     
+    // nyahoon extension
+    bool savePNGToStream(l::io::IOutputStream* pStream, bool isToRGB = true);
     
     /** treats (or not) PVR files as if they have alpha premultiplied.
      Since it is impossible to know at runtime if the PVR images have the alpha channel premultiplied, it is
