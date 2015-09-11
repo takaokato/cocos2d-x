@@ -730,7 +730,7 @@ bool Node::isVisible() const
 /// isVisible setter
 void Node::setVisible(bool visible)
 {
-    if(visible != _visible)
+    if((!visible) != (!_visible))
     {
 		if (_visible) {
 			setSceneDirty();

@@ -839,69 +839,90 @@ void Sprite::setDirtyRecursively(bool bValue)
 
 void Sprite::setPosition(const Vec2& pos)
 {
-    Node::setPosition(pos);
-    SET_DIRTY_RECURSIVELY();
+    if (pos.x != getPositionX() || pos.y != getPositionY()) {
+	    Node::setPosition(pos);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setPosition(float x, float y)
 {
-    Node::setPosition(x, y);
-    SET_DIRTY_RECURSIVELY();
+    if (x != getPositionX() || y != getPositionY()) {
+	    Node::setPosition(x, y);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setRotation(float rotation)
 {
-    Node::setRotation(rotation);
-    
-    SET_DIRTY_RECURSIVELY();
+    if (getRotation() != rotation) {
+	    Node::setRotation(rotation);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setRotationSkewX(float fRotationX)
 {
-    Node::setRotationSkewX(fRotationX);
-    SET_DIRTY_RECURSIVELY();
+    if (fRotationX != getRotationX()) {
+	    Node::setRotationSkewX(fRotationX);
+    	SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setRotationSkewY(float fRotationY)
 {
-    Node::setRotationSkewY(fRotationY);
-    SET_DIRTY_RECURSIVELY();
+    if (fRotationY != getRotationY()) {
+	    Node::setRotationSkewY(fRotationY);
+    	SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setSkewX(float sx)
 {
-    Node::setSkewX(sx);
-    SET_DIRTY_RECURSIVELY();
+    if (sx != getSkewX()) {
+	    Node::setSkewX(sx);
+    	SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setSkewY(float sy)
 {
-    Node::setSkewY(sy);
-    SET_DIRTY_RECURSIVELY();
+    if (sy != getSkewY()) {
+	    Node::setSkewY(sy);
+    	SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setScaleX(float scaleX)
 {
-    Node::setScaleX(scaleX);
-    SET_DIRTY_RECURSIVELY();
+    if (scaleX != getScaleX()) {
+	    Node::setScaleX(scaleX);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setScaleY(float scaleY)
 {
-    Node::setScaleY(scaleY);
-    SET_DIRTY_RECURSIVELY();
+    if (scaleY != getScaleY()) {
+	    Node::setScaleY(scaleY);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setScale(float fScale)
 {
-    Node::setScale(fScale, fScale);
-    SET_DIRTY_RECURSIVELY();
+    if (fScale != getScaleX() || fScale != getScaleY()) {
+	    Node::setScale(fScale, fScale);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setScale(float scaleX, float scaleY)
 {
-    Node::setScale(scaleX, scaleY);
-    SET_DIRTY_RECURSIVELY();
+    if (scaleX != getScaleX() || scaleY != getScaleY()) {
+	    Node::setScale(scaleX, scaleY);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setPositionZ(float fVertexZ)
@@ -924,8 +945,10 @@ void Sprite::ignoreAnchorPointForPosition(bool value)
 
 void Sprite::setVisible(bool bVisible)
 {
-    Node::setVisible(bVisible);
-    SET_DIRTY_RECURSIVELY();
+    if ((!bVisible) != (!isVisible())) {
+	    Node::setVisible(bVisible);
+	    SET_DIRTY_RECURSIVELY();
+    }
 }
 
 void Sprite::setFlippedX(bool flippedX)

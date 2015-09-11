@@ -162,7 +162,8 @@ bool Label::multilineTextWrapByWord()
                 nextLetterX += _horizontalKernings[letterIndex + 1];
             nextLetterX += letterDef.xAdvance + _additionalKerning;
 
-            wordRight = letterPosition.x + letterDef.width;
+//            wordRight = letterPosition.x + letterDef.width;
+            wordRight = nextLetterX - _additionalKerning;
 
             if (wordHighestY < letterPosition.y)
                 wordHighestY = letterPosition.y;
@@ -265,7 +266,8 @@ bool Label::multilineTextWrapByChar()
             nextLetterX += _horizontalKernings[index + 1];
         nextLetterX += letterDef.xAdvance + _additionalKerning;
 
-        letterRight = letterPosition.x + letterDef.width;
+        //letterRight = letterPosition.x + letterDef.width;
+        letterRight = nextLetterX - _additionalKerning;
 
         if (highestY < letterPosition.y)
             highestY = letterPosition.y;
