@@ -37,6 +37,7 @@ THE SOFTWARE.
 #endif
 #endif
 #if CC_REF_LEAK_DETECTION
+#include <stddef.h>
 #include <list>
 #endif
 
