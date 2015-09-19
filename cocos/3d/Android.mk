@@ -5,6 +5,8 @@ LOCAL_MODULE := cocos3d_static
 
 LOCAL_MODULE_FILENAME := libcocos3d
 
+LOCAL_CPPFLAGS += -frtti
+
 LOCAL_SRC_FILES := \
 CCRay.cpp \
 CCAABB.cpp \

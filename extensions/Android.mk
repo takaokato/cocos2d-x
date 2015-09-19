@@ -9,6 +9,8 @@ ifeq ($(USE_ARM_MODE),1)
 LOCAL_ARM_MODE := arm
 endif
 
+LOCAL_CPPFLAGS += -frtti
+
 LOCAL_SRC_FILES := \
 assets-manager/AssetsManager.cpp \
 assets-manager/Downloader.cpp \

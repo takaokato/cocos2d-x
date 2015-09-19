@@ -5,6 +5,8 @@ LOCAL_MODULE := cocostudio_static
 
 LOCAL_MODULE_FILENAME := libcocostudio
 
+LOCAL_CPPFLAGS += -frtti
+
 LOCAL_SRC_FILES := CCActionFrame.cpp \
 CCActionFrameEasing.cpp \
 CCActionManagerEx.cpp \

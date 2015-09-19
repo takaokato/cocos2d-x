@@ -277,6 +277,7 @@ LOCAL_WHOLE_STATIC_LIBRARIES := cocos2dxandroid_static
 LOCAL_CFLAGS   :=  -DUSE_FILE32API
 LOCAL_CFLAGS   +=  -fexceptions
 LOCAL_CPPFLAGS := -Wno-deprecated-declarations -Wno-extern-c-compat
+LOCAL_CPPFLAGS += -frtti
 LOCAL_EXPORT_CFLAGS   := -DUSE_FILE32API
 LOCAL_EXPORT_CPPFLAGS := -Wno-deprecated-declarations -Wno-extern-c-compat
 

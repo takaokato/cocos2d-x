@@ -5,6 +5,8 @@ LOCAL_MODULE := spine_static
 
 LOCAL_MODULE_FILENAME := libspine
 
+LOCAL_CPPFLAGS += -frtti
+
 LOCAL_SRC_FILES := Animation.c \
 AnimationState.c \
 AnimationStateData.c \
