@@ -63,6 +63,23 @@ public class Cocos2dxTypefaces {
             {
                 typeface = Typeface.createFromFile(assetName);
             }
+            if (assetName.startsWith("sys/default/")) {
+                if (assetName.compareTo("sys/default/MONOSPACE") == 0) {
+                    typeface = Typeface.MONOSPACE;
+                }
+                else if (assetName.compareTo("sys/default/SANS_SERIF") == 0) {
+                    typeface = Typeface.SANS_SERIF;
+                }
+                else if (assetName.compareTo("sys/default/SERIF") == 0) {
+                    typeface = Typeface.SERIF;
+                }
+                else if (assetName.compareTo("sys/default/DEFAULT_BOLD") == 0) {
+                    typeface = Typeface.DEFAULT_BOLD;
+                }
+                else {
+                    typeface = Typeface.DEFAULT;
+                }
+            }
             else
             {
                 typeface = Typeface.createFromAsset(context.getAssets(), assetName);
