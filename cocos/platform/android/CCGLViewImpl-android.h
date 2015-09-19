@@ -49,12 +49,16 @@ public:
     void swapBuffers() override;
     void setIMEKeyboardState(bool bOpen) override;
 
+	void setGLSurfaceView(void* jniEnv, void* view);
 protected:
     GLViewImpl();
     virtual ~GLViewImpl();
 
     bool initWithRect(const std::string& viewName, Rect rect, float frameZoomFactor);
     bool initWithFullScreen(const std::string& viewName);
+private:
+	void* m_jniEnv;
+	void* m_currentView;
 };
 
 NS_CC_END

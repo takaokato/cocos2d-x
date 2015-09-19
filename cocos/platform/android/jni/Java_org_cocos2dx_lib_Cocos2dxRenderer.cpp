@@ -4,6 +4,7 @@
 #include "base/CCEventCustom.h"
 #include "base/CCEventDispatcher.h"
 #include "../CCApplication.h"
+#include "../CCGLViewImpl-android.h"
 #include "platform/CCFileUtils.h"
 #include "JniHelper.h"
 #include <jni.h>
@@ -14,8 +15,11 @@ using namespace cocos2d;
 
 extern "C" {
 
-    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender(JNIEnv* env) {
+    JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender(JNIEnv* env, jobject thiz, jobject view) {
+		GLViewImpl* pGLView = static_cast<GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView());
+		pGLView->setGLSurfaceView(env, view);
         cocos2d::Director::getInstance()->mainLoop();
+		pGLView->setGLSurfaceView(NULL, NULL);
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnPause() {

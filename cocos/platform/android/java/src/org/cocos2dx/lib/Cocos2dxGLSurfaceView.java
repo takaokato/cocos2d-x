@@ -25,7 +25,7 @@ package org.cocos2dx.lib;
 
 import android.app.Activity;
 import android.content.Context;
-import android.opengl.GLSurfaceView;
+//import android.opengl.GLSurfaceView;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;

@@ -87,11 +87,17 @@ GLViewImpl* GLViewImpl::createWithFullScreen(const std::string& viewName)
 GLViewImpl::GLViewImpl()
 {
     initExtensions();
+	m_currentView = NULL;
 }
 
 GLViewImpl::~GLViewImpl()
 {
+}
 
+void GLViewImpl::setGLSurfaceView(void* jniEnv, void* view)
+{
+	m_jniEnv = jniEnv;
+	m_currentView = view;
 }
 
 bool GLViewImpl::initWithRect(const std::string& viewName, Rect rect, float frameZoomFactor)
@@ -117,6 +123,25 @@ void GLViewImpl::end()
 
 void GLViewImpl::swapBuffers()
 {
+	JNIEnv* pEnv = (JNIEnv*)m_jniEnv;
+	static jclass classObj = nullptr;
+	static jmethodID methodID;
+	if (classObj == nullptr) {
+		classObj = pEnv->FindClass("org.cocos2dx.lib.GLSurfaceView");
+		jboolean hasException = pEnv->ExceptionCheck();
+		if (hasException) {
+			__android_log_print(ANDROID_LOG_ERROR, "cocos2dx", "An exception occurred when finding org.cocos2dx.lib.GLSurfaceView class");
+			pEnv->ExceptionDescribe();
+		}
+		CC_ASSERT(classObj != nullptr);
+		methodID = pEnv->GetMethodID(classObj, "swap", "()V");
+		hasException = pEnv->ExceptionCheck();
+		if (hasException) {
+			__android_log_print(ANDROID_LOG_ERROR, "cocos2dx", "An exception occurred when retrieving swap() method");
+			pEnv->ExceptionDescribe();
+		}
+	}
+	pEnv->CallVoidMethod((jobject)m_currentView, methodID);
 }
 
 void GLViewImpl::setIMEKeyboardState(bool bOpen)

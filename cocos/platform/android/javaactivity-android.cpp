@@ -42,6 +42,7 @@ THE SOFTWARE.
 #include <dlfcn.h>
 #include <unwind.h>
 #include <ucontext.h>
+#include <cxxabi.h>
 
 #define  LOG_TAG    "main"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
@@ -63,26 +64,45 @@ static void ExitWithStackTrace(int sig_num, siginfo_t * info, void * ucontext)
 	void* lr = (void*)uc->uc_mcontext.arm_lr;
 	Dl_info dlInfo;
 	if (dladdr(pc, &dlInfo)) {
-		__android_log_print(ANDROID_LOG_ERROR, "SIGNAL", "%s(%p) at %s", strsignal(sig_num), info->si_addr, dlInfo.dli_sname);
+		int status;
+		const char* symbol = dlInfo.dli_sname;
+		char* demangledName = abi::__cxa_demangle(symbol, NULL, NULL, &status);
+		if (status == 0) {
+			symbol = demangledName;
+		}
+		__android_log_print(ANDROID_LOG_ERROR, "SIGNAL", "%s(%p) at %s", strsignal(sig_num), info->si_addr, symbol);
+		if (demangledName != NULL) {
+			free(demangledName);
+		}
 	}
 	else {
 		__android_log_print(ANDROID_LOG_ERROR, "SIGNAL", "%s(%p) at PC(%p)", strsignal(sig_num), info->si_addr, pc);
 	}
 	__android_log_print(ANDROID_LOG_ERROR, "SIGNAL", "sp:%p, fp:%p, lr:%p, pc:%p", sp, fp, lr, pc);
-	__android_log_print(ANDROID_LOG_ERROR, "SIGNAL", "fp[3]:%p, fp[2]:%p, fp[1]:%p, fp[0]:%p, fp[-1]:%p, fp[-2]:%p, fp[-3]:%p", fp[3], fp[2], fp[1], fp[0], fp[-1], fp[-2], fp[-3]);
 
 	__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "Start");
-	do {
+	for ( ; ; ) {
 		if (dladdr(lr, &dlInfo)) {
-			__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "%p:<%s>+%p", lr, dlInfo.dli_sname, dlInfo.dli_saddr);
+			int status;
+			const char* symbol = dlInfo.dli_sname;
+			char* demangledName = abi::__cxa_demangle(symbol, NULL, NULL, &status);
+			if (status == 0) {
+				symbol = demangledName;
+			}
+			__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "%p:<%s>+%p", lr, symbol, dlInfo.dli_saddr);
+			if (demangledName != NULL) {
+				free(demangledName);
+			}
 		}
 		else {
 			__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "%p", lr);
 		}
-		sp = fp;
-		lr = fp[-1];
-		fp = (void**)fp[-3];
-	} while (fp != NULL && sp < (void*)fp);
+		if (fp == NULL || (void*)fp < sp) {
+			sp = fp;
+			lr = fp[-1];
+			fp = (void**)fp[-3];
+		}
+	}
 	__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "End");
 #endif
 	exit(-1);
