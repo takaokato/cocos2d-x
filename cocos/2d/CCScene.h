@@ -112,7 +112,7 @@ public:
     void render(Renderer* renderer);
 
 	virtual bool isSceneDirty() const;
-	virtual void setSceneDirty();
+	virtual void setSceneDirty() override;
 	
     /** override function */
     virtual void removeAllChildren() override;
