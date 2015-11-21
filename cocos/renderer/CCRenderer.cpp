@@ -205,7 +205,7 @@ void RenderQueue::restoreRenderState()
 static const int DEFAULT_RENDER_QUEUE = 0;
 
 //
-// constructors, destructors, init
+// constructors, destructor, init
 //
 Renderer::Renderer()
 :_lastMaterialID(0)
@@ -553,6 +553,10 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 	const auto& zOpaque2DQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::OPAQUE_2D);
 	if (zOpaque2DQueue.size() > 0)
 	{
+        glDisable(GL_CULL_FACE);
+        RenderState::StateBlock::_defaultState->setCullFace(false);
+        glDisable(GL_BLEND);
+        RenderState::StateBlock::_defaultState->setBlend(false);
         if(_isDepthTestFor2D)
         {
 			glEnable(GL_DEPTH_TEST);
@@ -579,7 +583,6 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         }
 		flush();
 	}
-	
     //
     //Process Opaque Object
     //
@@ -590,9 +593,13 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_TRUE);
 		glDepthFunc(GL_LESS);
+        glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
 		RenderState::StateBlock::_defaultState->setDepthTest(true);
         RenderState::StateBlock::_defaultState->setDepthWrite(true);
 		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LESS);
+        RenderState::StateBlock::_defaultState->setBlend(false);
+        RenderState::StateBlock::_defaultState->setCullFace(true);
 
         for (auto it = opaqueQueue.cbegin(); it != opaqueQueue.cend(); ++it)
         {
@@ -607,6 +614,8 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 	const auto& zNegQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_NEG);
 	if (zNegQueue.size() > 0)
 	{
+        glEnable(GL_BLEND);
+        RenderState::StateBlock::_defaultState->setBlend(true);
 		if(_isDepthTestFor2D)
 		{
 			glEnable(GL_DEPTH_TEST);
@@ -639,11 +648,14 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
         glEnable(GL_DEPTH_TEST);
         glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);
+        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
 
         RenderState::StateBlock::_defaultState->setDepthTest(true);
         RenderState::StateBlock::_defaultState->setDepthWrite(false);
 		RenderState::StateBlock::_defaultState->setDepthFunction(RenderState::DEPTH_LEQUAL);
-
+        RenderState::StateBlock::_defaultState->setBlend(true);
+        RenderState::StateBlock::_defaultState->setCullFace(true);
 
         for (auto it = transQueue.cbegin(); it != transQueue.cend(); ++it)
         {
@@ -658,6 +670,8 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
     const auto& zZeroQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_ZERO);
     if (zZeroQueue.size() > 0)
     {
+        glDisable(GL_CULL_FACE);
+        RenderState::StateBlock::_defaultState->setCullFace(false);
         if(_isDepthTestFor2D)
         {
             glEnable(GL_DEPTH_TEST);
@@ -675,8 +689,12 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
 
             RenderState::StateBlock::_defaultState->setDepthTest(false);
             RenderState::StateBlock::_defaultState->setDepthWrite(false);
+            RenderState::StateBlock::_defaultState->setBlend(true);
 
         }
+        glDisable(GL_CULL_FACE);
+        RenderState::StateBlock::_defaultState->setCullFace(false);
+        
         for (auto it = zZeroQueue.cbegin(); it != zZeroQueue.cend(); ++it)
         {
             processRenderCommand(*it);
@@ -690,6 +708,33 @@ void Renderer::visitRenderQueue(RenderQueue& queue)
     const auto& zPosQueue = queue.getSubQueue(RenderQueue::QUEUE_GROUP::GLOBALZ_POS);
     if (zPosQueue.size() > 0)
     {
+        glDisable(GL_CULL_FACE);
+        RenderState::StateBlock::_defaultState->setCullFace(false);
+        if(_isDepthTestFor2D)
+        {
+            glEnable(GL_DEPTH_TEST);
+            glDepthMask(true);
+            glEnable(GL_BLEND);
+            
+            RenderState::StateBlock::_defaultState->setDepthTest(true);
+            RenderState::StateBlock::_defaultState->setDepthWrite(true);
+            RenderState::StateBlock::_defaultState->setBlend(true);
+            
+        }
+        else
+        {
+            glDisable(GL_DEPTH_TEST);
+            glDepthMask(false);
+            glEnable(GL_BLEND);
+            
+            RenderState::StateBlock::_defaultState->setDepthTest(false);
+            RenderState::StateBlock::_defaultState->setDepthWrite(false);
+            RenderState::StateBlock::_defaultState->setBlend(true);
+            
+        }
+        glDisable(GL_CULL_FACE);
+        RenderState::StateBlock::_defaultState->setCullFace(false);
+        
         for (auto it = zPosQueue.cbegin(); it != zPosQueue.cend(); ++it)
         {
             processRenderCommand(*it);
@@ -1082,8 +1127,10 @@ void Renderer::flushTriangles()
 bool Renderer::checkVisibility(const Mat4 &transform, const Size &size)
 {
     auto scene = Director::getInstance()->getRunningScene();
+    
+    //If draw to Rendertexture, return true directly.
     // only cull the default camera. The culling algorithm is valid for default camera.
-    if (scene && scene->_defaultCamera != Camera::getVisitingCamera())
+    if (!scene || (scene && scene->_defaultCamera != Camera::getVisitingCamera()))
         return true;
 
     auto director = Director::getInstance();
@@ -1100,7 +1147,7 @@ bool Renderer::checkVisibility(const Mat4 &transform, const Size &size)
     float wshw = std::max(fabsf(hSizeX * transform.m[0] + hSizeY * transform.m[4]), fabsf(hSizeX * transform.m[0] - hSizeY * transform.m[4]));
     float wshh = std::max(fabsf(hSizeX * transform.m[1] + hSizeY * transform.m[5]), fabsf(hSizeX * transform.m[1] - hSizeY * transform.m[5]));
     
-    // enlarge visable rect half size in screen coord
+    // enlarge visible rect half size in screen coord
     visiableRect.origin.x -= wshw;
     visiableRect.origin.y -= wshh;
     visiableRect.size.width += wshw * 2;

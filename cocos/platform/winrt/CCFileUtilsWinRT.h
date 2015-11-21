@@ -45,7 +45,7 @@ class CC_DLL CCFileUtilsWinRT : public FileUtils
     friend class FileUtils;
     CCFileUtilsWinRT();
 public:
-    /* override funtions */
+    /* override functions */
     bool init();
     virtual std::string getWritablePath() const;
     virtual bool isAbsolutePath(const std::string& strPath) const;
@@ -67,6 +67,16 @@ private:
     *  @return True if the file have been renamed successfully, false if not.
     */
     virtual bool renameFile(const std::string &path, const std::string &oldname, const std::string &name) override;
+
+
+    /**
+    *  Renames a file.
+    *
+    *  @param oldfullpath  The current name of the file, including path and name.
+    *  @param newfullpath  The new name of the file, including path and name
+    *  @return True if the file have been renamed successfully, false if not.
+    */
+    virtual bool renameFile(const std::string &oldfullpath, const std::string& newfullpath) override;
 
     /**
     *  Checks whether a directory exists without considering search paths and resolution orders.

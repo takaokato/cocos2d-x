@@ -58,7 +58,7 @@ public:
     /**
      * You can inherit from platform dependent implementation of FileUtils, such as FileUtilsAndroid,
      * and use this function to set delegate, then FileUtils will invoke delegate's implementation.
-     * Fox example, your resources are encrypted, so you need to decrypt it after reading data from
+     * For example, your resources are encrypted, so you need to decrypt it after reading data from
      * resources, then you can implement all getXXX functions, and engine will invoke your own getXX
      * functions when reading data of resources.
      *
@@ -377,7 +377,7 @@ public:
     * Windows fopen can't support UTF-8 filename
     * Need convert all parameters fopen and other 3rd-party libs
     *
-    * @param filename std::string name file for convertation from utf-8
+    * @param filename std::string name file for conversion from utf-8
     * @return std::string ansi filename in current locale
     */
     virtual std::string getSuitableFOpen(const std::string& filenameUtf8) const;
@@ -457,6 +457,15 @@ public:
     virtual bool renameFile(const std::string &path, const std::string &oldname, const std::string &name);
 
     /**
+     *  Renames a file under the given directory.
+     *
+     *  @param oldfullpath  The current fullpath of the file. Includes path and name.
+     *  @param newfullpath  The new fullpath of the file. Includes path and name.
+     *  @return True if the file have been renamed successfully, false if not.
+     */
+    virtual bool renameFile(const std::string &oldfullpath, const std::string &newfullpath);
+
+    /**
      *  Retrieve the file size.
      *
      *  @note If a relative path was passed in, it will be inserted a default root path at the beginning.
@@ -479,7 +488,7 @@ protected:
      *
      *  @note When you are porting Cocos2d-x to a new platform, you may need to take care of this method.
      *        You could assign a default value to _defaultResRootPath in the subclass of FileUtils(e.g. FileUtilsAndroid). Then invoke the FileUtils::init().
-     *  @return true if successed, otherwise it returns false.
+     *  @return true if succeed, otherwise it returns false.
      *
      */
     virtual bool init();

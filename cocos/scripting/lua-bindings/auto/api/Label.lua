@@ -139,6 +139,12 @@
 -- @return Label#Label self (return value: cc.Label)
         
 --------------------------------
+-- 
+-- @function [parent=#Label] getLineSpacing 
+-- @param self
+-- @return float#float ret (return value: float)
+        
+--------------------------------
 --  Update content immediately.
 -- @function [parent=#Label] updateContent 
 -- @param self
@@ -225,6 +231,13 @@
 -- @function [parent=#Label] setVerticalAlignment 
 -- @param self
 -- @param #int vAlignment
+-- @return Label#Label self (return value: cc.Label)
+        
+--------------------------------
+-- 
+-- @function [parent=#Label] setLineSpacing 
+-- @param self
+-- @param #float height
 -- @return Label#Label self (return value: cc.Label)
         
 --------------------------------
@@ -478,6 +491,13 @@
 -- @function [parent=#Label] updateDisplayedColor 
 -- @param self
 -- @param #color3b_table parentColor
+-- @return Label#Label self (return value: cc.Label)
+        
+--------------------------------
+-- 
+-- @function [parent=#Label] setGlobalZOrder 
+-- @param self
+-- @param #float globalZOrder
 -- @return Label#Label self (return value: cc.Label)
         
 return nil

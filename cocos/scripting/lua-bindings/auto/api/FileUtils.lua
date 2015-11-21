@@ -80,18 +80,15 @@
 -- @return bool#bool ret (return value: bool)
         
 --------------------------------
--- Renames a file under the given directory.<br>
--- param path     The parent directory path of the file, it must be an absolute path.<br>
--- param oldname  The current name of the file.<br>
--- param name     The new name of the file.<br>
--- return True if the file have been renamed successfully, false if not.
--- @function [parent=#FileUtils] renameFile 
+-- @overload self, string, string         
+-- @overload self, string, string, string         
+-- @function [parent=#FileUtils] renameFile
 -- @param self
 -- @param #string path
 -- @param #string oldname
 -- @param #string name
 -- @return bool#bool ret (return value: bool)
-        
+
 --------------------------------
 -- Loads the filenameLookup dictionary from the contents of a filename.<br>
 -- note The plist file name should follow the format below:<br>
@@ -303,7 +300,7 @@
 --------------------------------
 -- Windows fopen can't support UTF-8 filename<br>
 -- Need convert all parameters fopen and other 3rd-party libs<br>
--- param filename std::string name file for convertation from utf-8<br>
+-- param filename std::string name file for conversion from utf-8<br>
 -- return std::string ansi filename in current locale
 -- @function [parent=#FileUtils] getSuitableFOpen 
 -- @param self

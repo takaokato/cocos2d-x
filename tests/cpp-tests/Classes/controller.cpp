@@ -38,12 +38,13 @@ public:
         addTest("Click and Move", [](){return new ClickAndMoveTest(); });
         addTest("Configuration", []() { return new ConfigurationTests(); });
         addTest("Console", []() { return new ConsoleTests(); });
-#if (CC_TARGET_PLATFORM != CC_PLATFORM_WINRT) || (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT && _MSC_VER < 1900)
-        // Window 10 UWP does not yet support CURL
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_IOS) && (CC_TARGET_PLATFORM != CC_PLATFORM_ANDROID)
+        // android and ios don't use CURL
         addTest("Curl", []() { return new CurlTests(); });
 #endif
         addTest("Current Language", []() { return new CurrentLanguageTests(); });
         addTest("CocosStudio3D Test", []() { return new CocosStudio3DTests(); });
+        addTest("Downloader Test", []() { return new DownloaderTests(); });
         addTest("EventDispatcher", []() { return new EventDispatcherTests(); });
         addTest("Effects - Advanced", []() { return new EffectAdvanceTests(); });
         addTest("Effects - Basic", [](){return new EffectTests(); });
@@ -67,8 +68,10 @@ public:
         addTest("Node: Parallax", [](){return new ParallaxTests(); });
         addTest("Node: Particles", [](){return new ParticleTests(); });
         addTest("Node: Particle3D (PU)", [](){return new Particle3DTests(); });
+#if CC_USE_PHYSICS
         addTest("Node: Physics", []() { return new PhysicsTests(); });
-        addTest( "Node: Physics3D", []() { return new Physics3DTests(); } );
+#endif
+        addTest("Node: Physics3D", []() { return new Physics3DTests(); } );
         addTest("Node: RenderTexture", [](){return new RenderTextureTests(); });
         addTest("Node: Scene", [](){return new SceneTests(); });
         addTest("Node: Spine", [](){return new SpineTests(); });
@@ -82,11 +85,10 @@ public:
         addTest("Node: UI", [](){  return new UITests(); });
         addTest("Mouse", []() { return new MouseTests(); });
         addTest("MultiTouch", []() { return new MutiTouchTests(); });
-        addTest("Performance tests", []() { return new PerformanceTests(); });
         addTest("Renderer", []() { return new NewRendererTests(); });
         addTest("ReleasePool", [](){ return new ReleasePoolTests(); });
         addTest("Rotate World", [](){return new RotateWorldTests(); });
-        addTest("Scheduler", [](){return new SchedulerTests(); });//!!!!!!
+        addTest("Scheduler", [](){return new SchedulerTests(); });
         addTest("Shader - Basic", []() { return new ShaderTests(); });
         addTest("Shader - Sprite", []() { return new Shader2Tests(); });
         addTest("Texture2D", [](){return new Texture2DTests(); });
@@ -228,6 +230,7 @@ void TestController::traverseTestSuite(TestSuite* testSuite)
     logEx("%s%sBegin traverse TestSuite:%s", LOG_TAG, _logIndentation.c_str(), testSuite->getTestName().c_str());
 
     _logIndentation += LOG_INDENTATION;
+    testSuite->_currTestIndex = -1;
 
     auto logIndentation = _logIndentation;
     for (auto& callback : testSuite->_testCallbacks)
@@ -239,6 +242,7 @@ void TestController::traverseTestSuite(TestSuite* testSuite)
         TransitionScene* transitionScene = nullptr;
 
         if (_stopAutoTest) break;
+
         while (_isRunInBackground)
         {
             logEx("_director is paused");
@@ -265,6 +269,7 @@ void TestController::traverseTestSuite(TestSuite* testSuite)
                     testCase = (TestCase*)scene;
                     testCaseDuration = testCase->getDuration();
                 }
+                testSuite->_currTestIndex++;
                 testCase->setTestSuite(testSuite);
                 testCase->setTestCaseName(testName);
                 _director->replaceScene(scene);
