@@ -316,7 +316,7 @@ static BOOL _mixerRateSet = NO;
         _sourceGroups[i].startIndex = 0;
         _sourceGroups[i].currentIndex = _sourceGroups[i].startIndex;
         _sourceGroups[i].enabled = false;
-        _sourceGroups[i].nonInterruptible = false;
+        _sourceGroups[i].nonInterruptible = true;
         _sourceGroups[i].totalSources = definitions[i];
         _sourceGroups[i].sourceStatuses = malloc(sizeof(_sourceGroups[i].sourceStatuses[0]) * _sourceGroups[i].totalSources);
         if (_sourceGroups[i].sourceStatuses) {
