@@ -163,163 +163,165 @@ static int processTask(HttpClient* client, HttpRequest* request, NSString* reque
         return 0;
     }
     
-    //create request with url
-    NSString* urlstring = [NSString stringWithUTF8String:request->getUrl()];
-    NSURL *url = [NSURL URLWithString:urlstring];
-
-    NSMutableURLRequest *nsrequest = [NSMutableURLRequest requestWithURL:url
-                                               cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
-                                           timeoutInterval:HttpClient::getInstance()->getTimeoutForConnect()];
-    
-    //set request type
-    [nsrequest setHTTPMethod:requestType];
-
-    /* get custom header data (if set) */
-    std::vector<std::string> headers=request->getHeaders();
-    if(!headers.empty())
-    {
-        /* append custom headers one by one */
-        for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it)
+    @autoreleasepool {
+        //create request with url
+        NSString* urlstring = [NSString stringWithUTF8String:request->getUrl()];
+        NSURL *url = [NSURL URLWithString:urlstring];
+        
+        NSMutableURLRequest *nsrequest = [NSMutableURLRequest requestWithURL:url
+                                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData
+                                                             timeoutInterval:HttpClient::getInstance()->getTimeoutForConnect()];
+        
+        //set request type
+        [nsrequest setHTTPMethod:requestType];
+        
+        /* get custom header data (if set) */
+        std::vector<std::string> headers=request->getHeaders();
+        if(!headers.empty())
         {
-            unsigned long i = it->find(':', 0);
-            unsigned long length = it->size();
-            std::string field = it->substr(0, i);
-            std::string value = it->substr(i+1, length-i);
-            NSString *headerField = [NSString stringWithUTF8String:field.c_str()];
-            NSString *headerValue = [NSString stringWithUTF8String:value.c_str()];
-            [nsrequest setValue:headerValue forHTTPHeaderField:headerField];
-        }
-    }
-
-    //if request type is post or put,set header and data
-    if([requestType  isEqual: @"POST"] || [requestType isEqual: @"PUT"])
-    {
-        if ([requestType isEqual: @"PUT"])
-        {
-            [nsrequest setValue: @"application/x-www-form-urlencoded" forHTTPHeaderField: @"Content-Type"];
+            /* append custom headers one by one */
+            for (std::vector<std::string>::iterator it = headers.begin(); it != headers.end(); ++it)
+            {
+                unsigned long i = it->find(':', 0);
+                unsigned long length = it->size();
+                std::string field = it->substr(0, i);
+                std::string value = it->substr(i+1, length-i);
+                NSString *headerField = [NSString stringWithUTF8String:field.c_str()];
+                NSString *headerValue = [NSString stringWithUTF8String:value.c_str()];
+                [nsrequest setValue:headerValue forHTTPHeaderField:headerField];
+            }
         }
         
-        char* requestDataBuffer = request->getRequestData();
-        if (nullptr !=  requestDataBuffer && 0 != request->getRequestDataSize())
+        //if request type is post or put,set header and data
+        if([requestType  isEqual: @"POST"] || [requestType isEqual: @"PUT"])
         {
-            NSData *postData = [NSData dataWithBytes:requestDataBuffer length:request->getRequestDataSize()];
-            [nsrequest setHTTPBody:postData];
-        }
-    }
-
-    //read cookie propertities from file and set cookie
-    std::string cookieFilename = client->getCookieFilename();
-    if(!cookieFilename.empty() && nullptr != client->getCookie())
-    {
-        const CookiesInfo* cookieInfo = client->getCookie()->getMatchCookie(request->getUrl());
-        if(cookieInfo != nullptr)
-        {
-            NSString *domain = [NSString stringWithCString:cookieInfo->domain.c_str() encoding:[NSString defaultCStringEncoding]];
-            NSString *path = [NSString stringWithCString:cookieInfo->path.c_str() encoding:[NSString defaultCStringEncoding]];
-            NSString *value = [NSString stringWithCString:cookieInfo->value.c_str() encoding:[NSString defaultCStringEncoding]];
-            NSString *name = [NSString stringWithCString:cookieInfo->name.c_str() encoding:[NSString defaultCStringEncoding]];
-
-            // create the properties for a cookie
-            NSDictionary *properties = [NSDictionary dictionaryWithObjectsAndKeys: name,NSHTTPCookieName,
-            value, NSHTTPCookieValue, path, NSHTTPCookiePath,
-            domain, NSHTTPCookieDomain,
-            nil];
+            if ([requestType isEqual: @"PUT"])
+            {
+                [nsrequest setValue: @"application/x-www-form-urlencoded" forHTTPHeaderField: @"Content-Type"];
+            }
             
-            // create the cookie from the properties
-            NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
-            
-            // add the cookie to the cookie storage
-            [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            char* requestDataBuffer = request->getRequestData();
+            if (nullptr !=  requestDataBuffer && 0 != request->getRequestDataSize())
+            {
+                NSData *postData = [NSData dataWithBytes:requestDataBuffer length:request->getRequestDataSize()];
+                [nsrequest setHTTPBody:postData];
+            }
         }
-    }
-    
-    HttpAsynConnection *httpAsynConn = [[HttpAsynConnection new] autorelease];
-    httpAsynConn.srcURL = urlstring;
-    httpAsynConn.sslFile = nil;
-    
-    std::string sslCaFileName = client->getSSLVerification();
-    if(!sslCaFileName.empty())
-    {
-        long len = sslCaFileName.length();
-        long pos = sslCaFileName.rfind('.', len-1);
         
-        httpAsynConn.sslFile = [NSString stringWithUTF8String:sslCaFileName.substr(0, pos).c_str()];
-    }
-    [httpAsynConn startRequest:nsrequest];
-    
-    while( httpAsynConn.finish != true)
-    {
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
-    }
-    
-    //if http connection return error
-    if (httpAsynConn.connError != nil)
-    {
-        NSString* errorString = [httpAsynConn.connError localizedDescription];
-        strcpy(errorBuffer, [errorString UTF8String]);
-        return 0;
-    }
-
-    //if http response got error, just log the error
-    if (httpAsynConn.responseError != nil)
-    {
-        NSString* errorString = [httpAsynConn.responseError localizedDescription];
-        strcpy(errorBuffer, [errorString UTF8String]);
-    }
-    
-    *responseCode = httpAsynConn.responseCode;
-    
-    //add cookie to cookies vector
-    if(!cookieFilename.empty())
-    {
-        NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:httpAsynConn.responseHeader forURL:url];
-        for (NSHTTPCookie *cookie in cookies)
+        //read cookie propertities from file and set cookie
+        std::string cookieFilename = client->getCookieFilename();
+        if(!cookieFilename.empty() && nullptr != client->getCookie())
         {
-            //NSLog(@"Cookie: %@", cookie);
-            NSString *domain = cookie.domain;
-            //BOOL session = cookie.sessionOnly;
-            NSString *path = cookie.path;
-            BOOL secure = cookie.isSecure;
-            NSDate *date = cookie.expiresDate;
-            NSString *name = cookie.name;
-            NSString *value = cookie.value;
-            
-            CookiesInfo cookieInfo;
-            cookieInfo.domain = [domain cStringUsingEncoding: NSUTF8StringEncoding];
-            cookieInfo.path = [path cStringUsingEncoding: NSUTF8StringEncoding];
-            cookieInfo.secure = (secure == YES) ? true : false;
-            cookieInfo.expires = [[NSString stringWithFormat:@"%ld", (long)[date timeIntervalSince1970]] cStringUsingEncoding: NSUTF8StringEncoding];
-            cookieInfo.name = [name cStringUsingEncoding: NSUTF8StringEncoding];
-            cookieInfo.value = [value cStringUsingEncoding: NSUTF8StringEncoding];
-            cookieInfo.tailmatch = true;
-            
-            client->getCookie()->updateOrAddCookie(&cookieInfo);
+            const CookiesInfo* cookieInfo = client->getCookie()->getMatchCookie(request->getUrl());
+            if(cookieInfo != nullptr)
+            {
+                NSString *domain = [NSString stringWithCString:cookieInfo->domain.c_str() encoding:[NSString defaultCStringEncoding]];
+                NSString *path = [NSString stringWithCString:cookieInfo->path.c_str() encoding:[NSString defaultCStringEncoding]];
+                NSString *value = [NSString stringWithCString:cookieInfo->value.c_str() encoding:[NSString defaultCStringEncoding]];
+                NSString *name = [NSString stringWithCString:cookieInfo->name.c_str() encoding:[NSString defaultCStringEncoding]];
+                
+                // create the properties for a cookie
+                NSDictionary *properties = [NSDictionary dictionaryWithObjectsAndKeys: name,NSHTTPCookieName,
+                                            value, NSHTTPCookieValue, path, NSHTTPCookiePath,
+                                            domain, NSHTTPCookieDomain,
+                                            nil];
+                
+                // create the cookie from the properties
+                NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:properties];
+                
+                // add the cookie to the cookie storage
+                [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+            }
         }
+        
+        HttpAsynConnection *httpAsynConn = [[HttpAsynConnection new] autorelease];
+        httpAsynConn.srcURL = urlstring;
+        httpAsynConn.sslFile = nil;
+        
+        std::string sslCaFileName = client->getSSLVerification();
+        if(!sslCaFileName.empty())
+        {
+            long len = sslCaFileName.length();
+            long pos = sslCaFileName.rfind('.', len-1);
+            
+            httpAsynConn.sslFile = [NSString stringWithUTF8String:sslCaFileName.substr(0, pos).c_str()];
+        }
+        [httpAsynConn startRequest:nsrequest];
+        
+        while( httpAsynConn.finish != true)
+        {
+            [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+        }
+        
+        //if http connection return error
+        if (httpAsynConn.connError != nil)
+        {
+            NSString* errorString = [httpAsynConn.connError localizedDescription];
+            strcpy(errorBuffer, [errorString UTF8String]);
+            return 0;
+        }
+        
+        //if http response got error, just log the error
+        if (httpAsynConn.responseError != nil)
+        {
+            NSString* errorString = [httpAsynConn.responseError localizedDescription];
+            strcpy(errorBuffer, [errorString UTF8String]);
+        }
+        
+        *responseCode = httpAsynConn.responseCode;
+        
+        //add cookie to cookies vector
+        if(!cookieFilename.empty())
+        {
+            NSArray *cookies = [NSHTTPCookie cookiesWithResponseHeaderFields:httpAsynConn.responseHeader forURL:url];
+            for (NSHTTPCookie *cookie in cookies)
+            {
+                //NSLog(@"Cookie: %@", cookie);
+                NSString *domain = cookie.domain;
+                //BOOL session = cookie.sessionOnly;
+                NSString *path = cookie.path;
+                BOOL secure = cookie.isSecure;
+                NSDate *date = cookie.expiresDate;
+                NSString *name = cookie.name;
+                NSString *value = cookie.value;
+                
+                CookiesInfo cookieInfo;
+                cookieInfo.domain = [domain cStringUsingEncoding: NSUTF8StringEncoding];
+                cookieInfo.path = [path cStringUsingEncoding: NSUTF8StringEncoding];
+                cookieInfo.secure = (secure == YES) ? true : false;
+                cookieInfo.expires = [[NSString stringWithFormat:@"%ld", (long)[date timeIntervalSince1970]] cStringUsingEncoding: NSUTF8StringEncoding];
+                cookieInfo.name = [name cStringUsingEncoding: NSUTF8StringEncoding];
+                cookieInfo.value = [value cStringUsingEncoding: NSUTF8StringEncoding];
+                cookieInfo.tailmatch = true;
+                
+                client->getCookie()->updateOrAddCookie(&cookieInfo);
+            }
+        }
+        
+        //handle response header
+        NSMutableString *header = [NSMutableString string];
+        [header appendFormat:@"HTTP/1.1 %ld %@\n", (long)httpAsynConn.responseCode, httpAsynConn.statusString];
+        for (id key in httpAsynConn.responseHeader)
+        {
+            [header appendFormat:@"%@: %@\n", key, [httpAsynConn.responseHeader objectForKey:key]];
+        }
+        if (header.length > 0)
+        {
+            NSRange range = NSMakeRange(header.length-1, 1);
+            [header deleteCharactersInRange:range];
+        }
+        NSData *headerData = [header dataUsingEncoding:NSUTF8StringEncoding];
+        std::vector<char> *headerBuffer = (std::vector<char>*)headerStream;
+        const void* headerptr = [headerData bytes];
+        long headerlen = [headerData length];
+        headerBuffer->insert(headerBuffer->end(), (char*)headerptr, (char*)headerptr+headerlen);
+        
+        //handle response data
+        std::vector<char> *recvBuffer = (std::vector<char>*)stream;
+        const void* ptr = [httpAsynConn.responseData bytes];
+        long len = [httpAsynConn.responseData length];
+        recvBuffer->insert(recvBuffer->end(), (char*)ptr, (char*)ptr+len);
     }
-    
-    //handle response header
-    NSMutableString *header = [NSMutableString string];
-    [header appendFormat:@"HTTP/1.1 %ld %@\n", (long)httpAsynConn.responseCode, httpAsynConn.statusString];
-    for (id key in httpAsynConn.responseHeader)
-    {
-        [header appendFormat:@"%@: %@\n", key, [httpAsynConn.responseHeader objectForKey:key]];
-    }
-    if (header.length > 0)
-    {
-        NSRange range = NSMakeRange(header.length-1, 1);
-        [header deleteCharactersInRange:range];
-    }
-    NSData *headerData = [header dataUsingEncoding:NSUTF8StringEncoding];
-    std::vector<char> *headerBuffer = (std::vector<char>*)headerStream;
-    const void* headerptr = [headerData bytes];
-    long headerlen = [headerData length];
-    headerBuffer->insert(headerBuffer->end(), (char*)headerptr, (char*)headerptr+headerlen);
-
-    //handle response data
-    std::vector<char> *recvBuffer = (std::vector<char>*)stream;
-    const void* ptr = [httpAsynConn.responseData bytes];
-    long len = [httpAsynConn.responseData length];
-    recvBuffer->insert(recvBuffer->end(), (char*)ptr, (char*)ptr+len);
     
     return 1;
 }
