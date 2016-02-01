@@ -758,11 +758,12 @@ static BOOL _mixerRateSet = NO;
     ALint sourceState = 0;
     sourceGroup *thisSourceGroup = &_sourceGroups[sourceGroupId];
     thisSourceGroup->currentIndex = thisSourceGroup->startIndex;
+    int nextStartIndex = 0;
     while (!complete) {
         //Iterate over sources looking for one that is not locked, first bit indicates if source is locked
         if ((thisSourceGroup->sourceStatuses[thisSourceGroup->currentIndex] & 1) == 0) {
             //This source is not locked
-            sourceIndex = thisSourceGroup->sourceStatuses[thisSourceGroup->currentIndex] >> 1;//shift back to get the index
+            int index = thisSourceGroup->sourceStatuses[thisSourceGroup->currentIndex] >> 1;//shift back to get the index
             if (thisSourceGroup->nonInterruptible) {
                 //Check if this source is playing, if so it can't be interrupted
                 alGetSourcei(_sources[sourceIndex].sourceId, AL_SOURCE_STATE, &sourceState);
@@ -770,13 +771,17 @@ static BOOL _mixerRateSet = NO;
                     //complete = YES;
                     //Set start index so next search starts at the next position
                     thisSourceGroup->startIndex = thisSourceGroup->currentIndex + 1;
+                    sourceIndex = index;
                     break;
-                } else {
-                    sourceIndex = -1;//The source index was no good because the source was playing
+                } else if (sourceIndex == -1) {
+                    // if all sounds are playing, use the first index found.
+                    sourceIndex = index;
+                    nextStartIndex = thisSourceGroup->currentIndex + 1;
                 }    
             } else {    
                 //complete = YES;
                 //Set start index so next search starts at the next position
+                sourceIndex = index;
                 thisSourceGroup->startIndex = thisSourceGroup->currentIndex + 1;
                 break;
             }    
@@ -789,7 +794,10 @@ static BOOL _mixerRateSet = NO;
         if (thisSourceGroup->currentIndex == thisSourceGroup->startIndex) {
             //We have looped around and got back to the start
             complete = YES;
-        }    
+            if (0 <= sourceIndex) {
+	            thisSourceGroup->startIndex = nextStartIndex;
+            }
+        }
     }
 
     //Reset start index to beginning if beyond bounds
