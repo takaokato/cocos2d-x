@@ -68,7 +68,7 @@ public:
     static HttpClient *getInstance();
     
     /** 
-     * Relase the instance of HttpClient. 
+     * Release the instance of HttpClient. 
      */
     static void destroyInstance();
 
@@ -208,7 +208,7 @@ private:
     HttpRequest* _requestSentinel;
 };
 
-}
+} // namespace network
 
 NS_CC_END
 
