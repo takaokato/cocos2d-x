@@ -164,6 +164,7 @@ public:
 
 	bool generateMipmaps();
 	bool reduceSize(int mipLevel);
+    bool downSizeTo(int width, int height);
 
 protected:
 #if defined(CC_USE_WIC)
