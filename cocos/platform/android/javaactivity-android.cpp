@@ -103,6 +103,9 @@ static void ExitWithStackTrace(int sig_num, siginfo_t * info, void * ucontext)
 			lr = fp[-1];
 			fp = (void**)fp[-3];
 		}
+		else {
+			break;
+		}
 	}
 	__android_log_print(ANDROID_LOG_ERROR, "Stack Trace", "End");
 #endif
