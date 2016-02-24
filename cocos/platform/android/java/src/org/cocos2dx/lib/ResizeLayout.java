@@ -29,7 +29,8 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 public class ResizeLayout extends FrameLayout {
-    private  boolean mEnableForceDoLayout = false;
+    private Handler mForceLayoutHandler = null;
+    private Runnable mForceLayoutFunc = null;
 
     public ResizeLayout(Context context){
         super(context);
@@ -40,29 +41,35 @@ public class ResizeLayout extends FrameLayout {
     }
 
     public void setEnableForceDoLayout(boolean flag){
-        mEnableForceDoLayout = flag;
+        if (flag) {
+            if (mForceLayoutHandler == null) {
+                mForceLayoutHandler = new Handler();
+            }
+            if (mForceLayoutFunc == null) {
+                mForceLayoutFunc = new Runnable() {
+                    @Override
+                    public void run() {
+                        requestLayout();
+                        invalidate();
+                    }
+                };
+            }
+        }
+        else {
+            mForceLayoutHandler = null;
+        }
     }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
-        if(mEnableForceDoLayout){
+        if(mForceLayoutHandler != null){
             /*This is a hot-fix for some android devices which don't do layout when the main window
             * is paned.  We refersh the layout in 24 frames per seconds.
             * When the editBox is lose focus or when user begin to type, the do layout is disabled.
             */
-            final Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    //Do something after 100ms
-                    requestLayout();
-                    invalidate();
-                }
-            }, 1000 / 24);
-
+            mForceLayoutHandler.postDelayed(mForceLayoutFunc, 1000 / 24);
         }
-
     }
 
 }

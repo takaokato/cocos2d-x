@@ -117,11 +117,12 @@ extern "C"
 
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 {
-	struct sigaction sigact;
-	sigact.sa_sigaction = ExitWithStackTrace;
-	sigact.sa_flags = SA_SIGINFO;
-	sigaction(SIGABRT, &sigact, (struct sigaction *)NULL);
-	sigaction(SIGSEGV, &sigact, (struct sigaction *)NULL);
+// now we are using native debugger, don't need to dump stack trace.
+//	struct sigaction sigact;
+//	sigact.sa_sigaction = ExitWithStackTrace;
+//	sigact.sa_flags = SA_SIGINFO;
+//	sigaction(SIGABRT, &sigact, (struct sigaction *)NULL);
+//	sigaction(SIGSEGV, &sigact, (struct sigaction *)NULL);
 
 	JniHelper::setJavaVM(vm);
 
