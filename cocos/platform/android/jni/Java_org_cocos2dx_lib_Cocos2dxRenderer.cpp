@@ -12,12 +12,16 @@
 #include "base/ccUTF8.h"
 
 using namespace cocos2d;
+namespace cocos2d {
+	void ExecuteTouchEvents();
+}
 
 extern "C" {
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeRender(JNIEnv* env, jobject thiz, jobject view) {
 		GLViewImpl* pGLView = static_cast<GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView());
 		pGLView->setGLSurfaceView(env, view);
+		cocos2d::ExecuteTouchEvents();
         cocos2d::Director::getInstance()->mainLoop();
 		pGLView->setGLSurfaceView(NULL, NULL);
     }
