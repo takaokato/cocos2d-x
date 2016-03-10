@@ -131,7 +131,7 @@ void HttpClient::networkThreadAlone(HttpRequest* request, HttpResponse* response
     decreaseThreadCountAndMayDeleteThis();
 }
     
-    void HttpClient::networkThreadAloneUnsafe(HttpRequest* request)
+void HttpClient::networkThreadAloneUnsafe(HttpRequest* request)
 {
 	// Create a HttpResponse object, the default setting is http access failed
 	HttpResponse *response = new (std::nothrow) HttpResponse(request);
@@ -485,6 +485,15 @@ void HttpClient::sendImmediateUnsafe(HttpRequest* request)
 	// request->retain(); do not retain in unsafe version. the caller should not release the request. releasing request is not thread safe.
 	auto t = std::thread(&HttpClient::networkThreadAloneUnsafe, this, request);
 	t.detach();
+}
+
+HttpResponse* HttpClient::sendImmediateSync(HttpRequest* request)
+{
+    HttpResponse *response = new (std::nothrow) HttpResponse(request);
+    char responseMessage[RESPONSE_BUFFER_SIZE] = { 0 };
+    processResponse(response, responseMessage);
+    response->autorelease();
+    return response;
 }
 
 // Poll and notify main thread if responses exists in queue
