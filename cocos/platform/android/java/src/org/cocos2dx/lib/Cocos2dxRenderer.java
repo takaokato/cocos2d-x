@@ -45,7 +45,6 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     private int mScreenWidth = 0;
     private int mScreenHeight = 0;
     private boolean mNativeInitCompleted = false;
-    private boolean mScreenSizeChanged = false;
 
     // ===========================================================
     // Constructors
@@ -60,9 +59,6 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     }
 
     public void setScreenWidthAndHeight(final int surfaceWidth, final int surfaceHeight) {
-        if (!mScreenSizeChanged) {
-            mScreenSizeChanged = (this.mScreenWidth != 0 && this.mScreenWidth != surfaceWidth) || (this.mScreenHeight != 0 && this.mScreenHeight != surfaceHeight);
-        }
         this.mScreenWidth = surfaceWidth;
         this.mScreenHeight = surfaceHeight;
     }
@@ -85,10 +81,6 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(GLSurfaceView view, final GL10 gl) {
-        if (mScreenSizeChanged) {
-            Cocos2dxRenderer.nativeOnSurfaceChanged(this.mScreenWidth, this.mScreenHeight);
-            mScreenSizeChanged = false;
-        }
         /*
          * No need to use algorithm in default(60 FPS) situation,
          * since onDrawFrame() was called by system 60 times per second by default.
