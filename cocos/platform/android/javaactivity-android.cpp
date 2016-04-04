@@ -42,6 +42,7 @@ THE SOFTWARE.
 
 #define  LOG_TAG    "main"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#define THROW_EXCEPTION(env) env->ThrowNew(env->FindClass("java/lang/Exception"), "Unexpected error occurred."); throw
 
 void cocos_android_app_init(JNIEnv* env) __attribute__((weak));
 
@@ -64,54 +65,69 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
 
 JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, jobject thiz, jint w, jint h)
 {
-    auto director = cocos2d::Director::getInstance();
-    auto glview = director->getOpenGLView();
-    if (!glview)
-    {
-        glview = cocos2d::GLViewImpl::create("Android app");
-        glview->setFrameSize(w, h);
-        director->setOpenGLView(glview);
+	try {
+		auto director = cocos2d::Director::getInstance();
+	    auto glview = director->getOpenGLView();
+		if (!glview)
+		{
+        	glview = cocos2d::GLViewImpl::create("Android app");
+        	glview->setFrameSize(w, h);
+        	director->setOpenGLView(glview);
 
-        cocos2d::Application::getInstance()->run();
-    }
-    else
-    {
-        cocos2d::GL::invalidateStateCache();
-        cocos2d::GLProgramCache::getInstance()->reloadDefaultGLPrograms();
-        cocos2d::DrawPrimitives::init();
-        cocos2d::VolatileTextureMgr::reloadAllTextures();
+        	cocos2d::Application::getInstance()->run();
+    	}
+    	else
+    	{
+        	cocos2d::GL::invalidateStateCache();
+        	cocos2d::GLProgramCache::getInstance()->reloadDefaultGLPrograms();
+        	cocos2d::DrawPrimitives::init();
+        	cocos2d::VolatileTextureMgr::reloadAllTextures();
 
-        cocos2d::EventCustom recreatedEvent(EVENT_RENDERER_RECREATED);
-        director->getEventDispatcher()->dispatchEvent(&recreatedEvent);
-        director->setGLDefaultValues();
+        	cocos2d::EventCustom recreatedEvent(EVENT_RENDERER_RECREATED);
+        	director->getEventDispatcher()->dispatchEvent(&recreatedEvent);
+        	director->setGLDefaultValues();
+    	}
+    	cocos2d::network::_preloadJavaDownloaderClass();
     }
-    cocos2d::network::_preloadJavaDownloaderClass();
+    catch (...) {
+        THROW_EXCEPTION(env);
+    }
 }
 
-JNIEXPORT jintArray Java_org_cocos2dx_lib_Cocos2dxActivity_getGLContextAttrs(JNIEnv*  env, jobject thiz)
+JNIEXPORT jintArray Java_org_cocos2dx_lib_Cocos2dxActivity_getGLContextAttrs(JNIEnv* env, jobject thiz)
 {
-    cocos2d::Application::getInstance()->initGLContextAttrs(); 
-    GLContextAttrs _glContextAttrs = GLView::getGLContextAttrs();
+	try {
+	    cocos2d::Application::getInstance()->initGLContextAttrs();
+	    GLContextAttrs _glContextAttrs = GLView::getGLContextAttrs();
     
-    int tmp[6] = {_glContextAttrs.redBits, _glContextAttrs.greenBits, _glContextAttrs.blueBits,
+	    int tmp[6] = {_glContextAttrs.redBits, _glContextAttrs.greenBits, _glContextAttrs.blueBits,
                            _glContextAttrs.alphaBits, _glContextAttrs.depthBits, _glContextAttrs.stencilBits};
 
 
-    jintArray glContextAttrsJava = env->NewIntArray(6);
-        env->SetIntArrayRegion(glContextAttrsJava, 0, 6, tmp); 
+	    jintArray glContextAttrsJava = env->NewIntArray(6);
+	    env->SetIntArrayRegion(glContextAttrsJava, 0, 6, tmp);
     
-    return glContextAttrsJava;
+    	return glContextAttrsJava;
+   	}
+    catch (...) {
+        THROW_EXCEPTION(env);
+    }
 }
 
-JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnSurfaceChanged(JNIEnv*  env, jobject thiz, jint w, jint h)
+JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeOnSurfaceChanged(JNIEnv* env, jobject thiz, jint w, jint h)
 {
-    auto glview = cocos2d::Director::getInstance()->getOpenGLView();
-    if (glview)
-    {
-		glview->setFrameSize(w, h);
-		glview->setDesignResolutionSize(w, h, ResolutionPolicy::UNKNOWN);
+	try {
+	    auto glview = cocos2d::Director::getInstance()->getOpenGLView();
+	    if (glview)
+	    {
+			glview->setFrameSize(w, h);
+			glview->setDesignResolutionSize(w, h, ResolutionPolicy::UNKNOWN);
+	    }
+	    cocos2d::Application::getInstance()->applicationScreenSizeChanged(w, h);
+	}
+    catch (...) {
+        THROW_EXCEPTION(env);
     }
-    cocos2d::Application::getInstance()->applicationScreenSizeChanged(w, h);
 }
 
 }

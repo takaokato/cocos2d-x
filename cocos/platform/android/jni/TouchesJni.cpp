@@ -153,8 +153,9 @@ extern "C" {
 #define KEYCODE_ENTER 0x42
 #define KEYCODE_PLAY  0x7e
 #define KEYCODE_DPAD_CENTER  0x17
-    
-    
+
+#define THROW_EXCEPTION(env) env->ThrowNew(env->FindClass("java/lang/Exception"), "Unexpected error occurred."); throw
+
     static std::unordered_map<int, cocos2d::EventKeyboard::KeyCode> g_keyCodeMap = {
         { KEYCODE_BACK , cocos2d::EventKeyboard::KeyCode::KEY_ESCAPE},
         { KEYCODE_MENU , cocos2d::EventKeyboard::KeyCode::KEY_MENU},
@@ -169,16 +170,21 @@ extern "C" {
     };
     
     JNIEXPORT jboolean JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyEvent(JNIEnv * env, jobject thiz, jint keyCode, jboolean isPressed) {
-        Director* pDirector = Director::getInstance();
-        
-        auto iterKeyCode = g_keyCodeMap.find(keyCode);
-        if (iterKeyCode == g_keyCodeMap.end()) {
-            return JNI_FALSE;
+        try {
+            Director *pDirector = Director::getInstance();
+
+            auto iterKeyCode = g_keyCodeMap.find(keyCode);
+            if (iterKeyCode == g_keyCodeMap.end()) {
+                return JNI_FALSE;
+            }
+
+            cocos2d::EventKeyboard::KeyCode cocos2dKey = g_keyCodeMap.at(keyCode);
+            cocos2d::EventKeyboard event(cocos2dKey, isPressed);
+            cocos2d::Director::getInstance()->getEventDispatcher()->dispatchEvent(&event);
+            return JNI_TRUE;
         }
-        
-        cocos2d::EventKeyboard::KeyCode cocos2dKey = g_keyCodeMap.at(keyCode);
-        cocos2d::EventKeyboard event(cocos2dKey, isPressed);
-        cocos2d::Director::getInstance()->getEventDispatcher()->dispatchEvent(&event);
-        return JNI_TRUE;
+        catch (...) {
+            THROW_EXCEPTION(env);
+        }
         
     }}

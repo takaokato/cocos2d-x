@@ -838,7 +838,13 @@ std::string FileUtils::fullPathForFilename(const std::string &filename) const
     }
 
     if(isPopupNotify()){
+#if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID && defined(COCOS2D_DEBUG) && COCOS2D_DEBUG
+        if (filename.find("sys/default/") != 0) { // sys/default はシステムフォント用に予約してある.
+            CCLOG("cocos2d: fullPathForFilename: No file found at %s. Possible missing file.", filename.c_str());
+        }
+#else
         CCLOG("cocos2d: fullPathForFilename: No file found at %s. Possible missing file.", filename.c_str());
+#endif
     }
 
     // The file wasn't found, return empty string.
