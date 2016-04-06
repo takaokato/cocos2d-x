@@ -162,7 +162,7 @@ private:
 //
 static Map<std::string, BMFontConfiguration*>* s_configurations = nullptr;
 
-BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
+CC_DLL BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
 {
     BMFontConfiguration* ret = nullptr;
 
@@ -184,7 +184,7 @@ BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
     return ret;
 }
 
-const std::string& FNTConfigGetAtlasName(const BMFontConfiguration* config)
+CC_DLL const std::string& FNTConfigGetAtlasName(const BMFontConfiguration* config)
 {
     return config->getAtlasName();
 }

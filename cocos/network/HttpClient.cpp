@@ -506,6 +506,21 @@ void HttpClient::sendImmediateUnsafe(HttpRequest* request)
 	t.detach();
 }
 
+HttpResponse* HttpClient::sendImmediateSync(HttpRequest* request)
+{
+	if (!request)
+	{
+		return nullptr;
+	}
+
+	HttpResponse *response = new (std::nothrow) HttpResponse(request);
+
+	char errorBuffer[CURL_ERROR_SIZE] = { 0 };
+	processResponse(response, errorBuffer);
+	response->autorelease();
+	return response;
+}
+
 // Poll and notify main thread if responses exists in queue
 void HttpClient::dispatchResponseCallbacks()
 {
