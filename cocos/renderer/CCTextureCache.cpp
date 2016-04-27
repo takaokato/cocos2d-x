@@ -380,7 +380,7 @@ void TextureCache::parseNinePatchImage(cocos2d::Image *image, cocos2d::Texture2D
 
 }
 
-Texture2D* TextureCache::addImage(Image *image, const std::string &key)
+Texture2D* TextureCache::addImage(Image *image, const std::string &key, bool replace)
 {
     CCASSERT(image != nullptr, "TextureCache: image MUST not be nil");
 
@@ -391,6 +391,9 @@ Texture2D* TextureCache::addImage(Image *image, const std::string &key)
         auto it = _textures.find(key);
         if( it != _textures.end() ) {
             texture = it->second;
+            if (replace) {
+                texture->initWithImage(image);
+            }
             break;
         }
 
