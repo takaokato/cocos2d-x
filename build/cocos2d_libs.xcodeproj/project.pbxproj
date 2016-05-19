@@ -2072,10 +2072,10 @@
 		B5668D7E1B3838E4003CBD5E /* UIScrollViewBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5668D7B1B3838E4003CBD5E /* UIScrollViewBar.cpp */; };
 		B5668D7F1B3838E4003CBD5E /* UIScrollViewBar.h in Headers */ = {isa = PBXBuildFile; fileRef = B5668D7C1B3838E4003CBD5E /* UIScrollViewBar.h */; };
 		B5668D801B3838E4003CBD5E /* UIScrollViewBar.h in Headers */ = {isa = PBXBuildFile; fileRef = B5668D7C1B3838E4003CBD5E /* UIScrollViewBar.h */; };
-		B5A738961BB0051F00BAAEF8 /* UIPageViewIndicator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5A738941BB0051F00BAAEF8 /* UIPageViewIndicator.cpp */; settings = {ASSET_TAGS = (); }; };
-		B5A738971BB0051F00BAAEF8 /* UIPageViewIndicator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5A738941BB0051F00BAAEF8 /* UIPageViewIndicator.cpp */; settings = {ASSET_TAGS = (); }; };
-		B5A738981BB0051F00BAAEF8 /* UIPageViewIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A738951BB0051F00BAAEF8 /* UIPageViewIndicator.h */; settings = {ASSET_TAGS = (); }; };
-		B5A738991BB0051F00BAAEF8 /* UIPageViewIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A738951BB0051F00BAAEF8 /* UIPageViewIndicator.h */; settings = {ASSET_TAGS = (); }; };
+		B5A738961BB0051F00BAAEF8 /* UIPageViewIndicator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5A738941BB0051F00BAAEF8 /* UIPageViewIndicator.cpp */; };
+		B5A738971BB0051F00BAAEF8 /* UIPageViewIndicator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5A738941BB0051F00BAAEF8 /* UIPageViewIndicator.cpp */; };
+		B5A738981BB0051F00BAAEF8 /* UIPageViewIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A738951BB0051F00BAAEF8 /* UIPageViewIndicator.h */; };
+		B5A738991BB0051F00BAAEF8 /* UIPageViewIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = B5A738951BB0051F00BAAEF8 /* UIPageViewIndicator.h */; };
 		B5CE6DBE1B3BF2B1002B0419 /* UIAbstractCheckButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5CE6DBC1B3BF2B1002B0419 /* UIAbstractCheckButton.cpp */; };
 		B5CE6DBF1B3BF2B1002B0419 /* UIAbstractCheckButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B5CE6DBC1B3BF2B1002B0419 /* UIAbstractCheckButton.cpp */; };
 		B5CE6DC01B3BF2B1002B0419 /* UIAbstractCheckButton.h in Headers */ = {isa = PBXBuildFile; fileRef = B5CE6DBD1B3BF2B1002B0419 /* UIAbstractCheckButton.h */; };
@@ -12982,6 +12982,7 @@
 				);
 				OTHER_LDFLAGS = "-llibsql3";
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../external/freetype2/include/ios $(SRCROOT)/../external/curl/include/ios $(SRCROOT)/../external/webp/include/ios $(SRCROOT)/../external/tiff/include/ios $(SRCROOT)/../external/jpeg/include/ios $(SRCROOT)/../external/png/include/ios $(SRCROOT)/../external/websockets/include/ios $(SRCROOT)/../external/chipmunk/include/chipmunk $(SRCROOT)/../external/freetype2/include/ios/freetype2";
 				VALID_ARCHS = "arm64 armv7";
@@ -12992,6 +12993,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				COPY_PHASE_STRIP = NO;
 				EXECUTABLE_PREFIX = "";
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -13015,6 +13017,7 @@
 				);
 				OTHER_LDFLAGS = "-llibsql3";
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../external/freetype2/include/ios $(SRCROOT)/../external/curl/include/ios $(SRCROOT)/../external/webp/include/ios $(SRCROOT)/../external/tiff/include/ios $(SRCROOT)/../external/jpeg/include/ios $(SRCROOT)/../external/png/include/ios $(SRCROOT)/../external/websockets/include/ios $(SRCROOT)/../external/chipmunk/include/chipmunk $(SRCROOT)/../external/freetype2/include/ios/freetype2";
 				VALID_ARCHS = "arm64 armv7";
@@ -13119,6 +13122,7 @@
 					"\"$(SRCROOT)/../external/chipmunk/prebuilt/ios\"",
 				);
 				SDKROOT = iphoneos;
+				STRIP_INSTALLED_PRODUCT = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../external/freetype2/include/ios $(SRCROOT)/../external/curl/include/ios $(SRCROOT)/../external/webp/include/ios $(SRCROOT)/../external/tiff/include/ios $(SRCROOT)/../external/jpeg/include/ios $(SRCROOT)/../external/png/include/ios $(SRCROOT)/../external/websockets/include/ios $(SRCROOT)/../external/chipmunk/include/chipmunk";
 				VALID_ARCHS = "arm64 armv7";
