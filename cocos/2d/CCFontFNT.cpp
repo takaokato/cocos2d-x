@@ -141,7 +141,7 @@ public:
     /** initializes a BitmapFontConfiguration with a FNT file */
     bool initWithFNTfile(const std::string& FNTfile);
     
-    inline const std::string& getAtlasName(){ return _atlasName; }
+    inline const std::string& getAtlasName() const { return _atlasName; }
     inline void setAtlasName(const std::string& atlasName) { _atlasName = atlasName; }
     
     std::set<unsigned int>* getCharacterSet() const;
@@ -162,7 +162,7 @@ private:
 //
 static Map<std::string, BMFontConfiguration*>* s_configurations = nullptr;
 
-BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
+CC_DLL BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
 {
     BMFontConfiguration* ret = nullptr;
 
@@ -182,6 +182,11 @@ BMFontConfiguration* FNTConfigLoadFile(const std::string& fntFile)
     }
 
     return ret;
+}
+
+CC_DLL const std::string& FNTConfigGetAtlasName(const BMFontConfiguration* config)
+{
+    return config->getAtlasName();
 }
 
 //

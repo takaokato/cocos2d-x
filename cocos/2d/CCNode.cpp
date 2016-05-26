@@ -32,7 +32,9 @@ THE SOFTWARE.
 
 #include <algorithm>
 #include <string>
+#ifdef CC_USE_REGEX
 #include <regex>
+#endif
 
 #include "base/CCDirector.h"
 #include "base/CCScheduler.h"
@@ -947,7 +949,11 @@ bool Node::doEnumerate(std::string name, std::function<bool (Node *)> callback) 
     bool ret = false;
     for (const auto& child : _children)
     {
+#ifdef CC_USE_REGEX
         if (std::regex_match(child->_name, std::regex(searchName)))
+#else
+        if (child->_name == searchName)
+#endif
         {
             if (!needRecursive)
             {

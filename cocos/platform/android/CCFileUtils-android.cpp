@@ -31,7 +31,9 @@ THE SOFTWARE.
 #include "jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
 #include "android/asset_manager.h"
 #include "android/asset_manager_jni.h"
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
 #include "jni/CocosPlayClient.h"
+#endif
 #include <stdlib.h>
 #include <sys/stat.h>
 
@@ -78,12 +80,14 @@ FileUtilsAndroid::~FileUtilsAndroid()
 
 bool FileUtilsAndroid::init()
 {
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     cocosplay::lazyInit();
     if (cocosplay::isEnabled() && !cocosplay::isDemo())
     {
         _defaultResRootPath = cocosplay::getGameRoot();
     }
     else
+#endif
     {
         _defaultResRootPath = "assets/";
     }
@@ -150,10 +154,12 @@ bool FileUtilsAndroid::isFileExistInternal(const std::string& strFilePath) const
         return false;
     }
 
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     if (cocosplay::isEnabled() && !cocosplay::isDemo())
     {
         return cocosplay::fileExists(strFilePath);
     }
+#endif
 
     bool bFound = false;
 
@@ -199,6 +205,7 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath) cons
     bool startWithAssets = (dirPath.find("assets/") == 0);
     int lenOfAssets = 7;
 
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     std::string tmpStr;
     if (cocosplay::isEnabled() && !cocosplay::isDemo())
     {
@@ -210,7 +217,8 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath) cons
         }
         tmpStr.append(s + lenOfAssets);
     }
-
+#endif
+	
     // find absolute path in flash memory
     if (s[0] == '/')
     {
@@ -264,8 +272,10 @@ Data FileUtilsAndroid::getData(const std::string& filename, bool forString)
     unsigned char* data = nullptr;
     ssize_t size = 0;
     string fullPath = fullPathForFilename(filename);
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     cocosplay::updateAssets(fullPath);
-
+#endif
+	
     if (fullPath[0] != '/')
     {
         string relativePath = string();
@@ -356,7 +366,9 @@ Data FileUtilsAndroid::getData(const std::string& filename, bool forString)
     else
     {
         ret.fastSet(data, size);
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
         cocosplay::notifyFileLoaded(fullPath);
+#endif
     }
 
     return ret;
@@ -387,8 +399,9 @@ unsigned char* FileUtilsAndroid::getFileData(const std::string& filename, const 
     }
 
     string fullPath = fullPathForFilename(filename);
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     cocosplay::updateAssets(fullPath);
-
+#endif
     if (fullPath[0] != '/')
     {
         string relativePath = string();
@@ -459,10 +472,12 @@ unsigned char* FileUtilsAndroid::getFileData(const std::string& filename, const 
         msg.append(filename).append(") failed!");
         CCLOG("%s", msg.c_str());
     }
+#ifdef CC_ENABLE_COCOS_PLAY_CLIENT
     else
     {
         cocosplay::notifyFileLoaded(fullPath);
     }
+#endif
     return data;
 }
 

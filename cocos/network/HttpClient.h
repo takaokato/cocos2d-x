@@ -118,6 +118,7 @@ public:
 
 	// request will be released in network thread. the caller should not release request.
 	void sendImmediateUnsafe(HttpRequest* request); // receive response in network thread (not the main thread)
+    HttpResponse* sendImmediateSync(HttpRequest* request);
 	
     /**
      * Set the timeout value for connecting.

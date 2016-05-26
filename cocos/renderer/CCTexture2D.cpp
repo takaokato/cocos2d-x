@@ -665,10 +665,12 @@ bool Texture2D::initWithMipmaps(MipmapInfo* mipmaps, int mipmapsNum, PixelFormat
             glTexImage2D(GL_TEXTURE_2D, i, info.internalFormat, (GLsizei)width, (GLsizei)height, 0, info.format, info.type, data);
         }
 
-        if (i > 0 && (width != height || ccNextPOT(width) != width ))
+#if defined(COCOS2D_DEBUG) && COCOS2D_DEBUG != 0
+        if (i > 0 && (ccNextPOT(width) != width || ccNextPOT(height) != height))
         {
             CCLOG("cocos2d: Texture2D. WARNING. Mipmap level %u is not squared. Texture won't render correctly. width=%d != height=%d", i, width, height);
         }
+#endif
 
         err = glGetError();
         if (err != GL_NO_ERROR)

@@ -141,8 +141,14 @@ public:
     * @param key The "key" parameter will be used as the "key" for the cache.
     * If "key" is nil, then a new texture will be created each time.
     */
-    Texture2D* addImage(Image *image, const std::string &key);
+    Texture2D* addImage(Image *image, const std::string &key, bool replace = false);
     CC_DEPRECATED_ATTRIBUTE Texture2D* addUIImage(Image *image, const std::string& key) { return addImage(image,key); }
+
+#if CC_ENABLE_CACHE_TEXTURE_DATA
+    bool registerTexture(Texture2D* pTex, const std::string &key, const std::function<void(Texture2D*, const std::string&)>& reloadFunc);
+#else
+    bool registerTexture(Texture2D* pTex, const std::string &key);
+#endif
 
     /** Returns an already created texture. Returns nil if the texture doesn't exist.
     @param key It's the related/absolute path of the file image.
@@ -234,14 +240,6 @@ protected:
 
 class VolatileTexture
 {
-    typedef enum {
-        kInvalid = 0,
-        kImageFile,
-        kImageData,
-        kString,
-        kImage,
-    }ccCachedImageType;
-
 private:
     VolatileTexture(Texture2D *t);
     /**
@@ -250,25 +248,62 @@ private:
      */
     ~VolatileTexture();
 
+    struct ImageParams {
+        ImageParams() : image(nullptr)
+        {
+        };
+        ~ImageParams()
+        {
+            CC_SAFE_RELEASE(image);
+        }
+        ImageParams(const ImageParams& rhs)
+        {
+            if (rhs.image != nullptr) {
+                rhs.image->retain();
+            }
+            image = rhs.image;
+        }
+        ImageParams(ImageParams&& rhs)
+        {
+            image = rhs.image;
+            rhs.image = nullptr;
+        }
+        const ImageParams& operator=(const ImageParams& rhs)
+        {
+            if (rhs.image != nullptr) {
+                rhs.image->retain();
+            }
+            CC_SAFE_RELEASE(image);
+            image = rhs.image;
+            return *this;
+        }
+        const ImageParams& operator=(ImageParams&& rhs)
+        {
+            if (this != &rhs) {
+                image = rhs.image;
+                rhs.image = nullptr;
+            }
+            return *this;
+        }
+        Image* image;
+    };
+    struct ImageDataParams {
+        void *textureData;
+        int  dataLen;
+        Size textureSize;
+        Texture2D::PixelFormat pixelFormat;
+    };
+    void reloadImageFile(Texture2D::PixelFormat pixelFormat);
+    void reloadImageData(const ImageDataParams& params);
+    void reloadString(const FontDefinition& fontDef);
+    void reloadImage(const ImageParams& params);
 protected:
-    friend class  VolatileTextureMgr;
-    Texture2D *_texture;
-    
-    Image *_uiImage;
-
-    ccCachedImageType _cashedImageType;
-
-    void *_textureData;
-    int  _dataLen;
-    Size _textureSize;
-    Texture2D::PixelFormat _pixelFormat;
-
-    std::string _fileName;
-
-    bool                      _hasMipmaps;
-    Texture2D::TexParams      _texParams;
-    std::string               _text;
-    FontDefinition            _fontDefinition;
+    friend class VolatileTextureMgr;
+    Texture2D*           _texture;
+    std::string          _fileNameOrText;
+    bool                 _hasMipmaps;
+    Texture2D::TexParams _texParams;
+    std::function<void(Texture2D*, const std::string&)> _reloadFunc;
 };
 
 class CC_DLL VolatileTextureMgr
@@ -278,6 +313,7 @@ public:
     static void addStringTexture(Texture2D *tt, const char* text, const FontDefinition& fontDefinition);
     static void addDataTexture(Texture2D *tt, void* data, int dataLen, Texture2D::PixelFormat pixelFormat, const Size& contentSize);
     static void addImage(Texture2D *tt, Image *image);
+    static void addTextureReloadFunc(Texture2D *tt, const std::string& key, const std::function<void(Texture2D*, const std::string&)>& reloadFunc);
 
     static void setHasMipmaps(Texture2D *t, bool hasMipmaps);
     static void setTexParameters(Texture2D *t, const Texture2D::TexParams &texParams);

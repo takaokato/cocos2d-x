@@ -37,7 +37,11 @@ namespace {
     static Touch* g_touches[EventTouch::MAX_TOUCHES] = { nullptr };
     static unsigned int g_indexBitsUsed = 0;
     // System touch pointer ID (It may not be ascending order number) <-> Ascending order number from 0
-    static std::map<intptr_t, int> g_touchIdReorderMap;
+    std::map<intptr_t, int>& getTouchIdReorderMap()
+    {
+	    static std::map<intptr_t, int> _touchIdReorderMap;
+        return _touchIdReorderMap;
+    }
     
     static int getUnUsedIndex()
     {
@@ -282,10 +286,10 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
         x = xs[i];
         y = ys[i];
 
-        auto iter = g_touchIdReorderMap.find(id);
+        auto iter = getTouchIdReorderMap().find(id);
 
         // it is a new touch
-        if (iter == g_touchIdReorderMap.end())
+        if (iter == getTouchIdReorderMap().end())
         {
             unusedIndex = getUnUsedIndex();
 
@@ -301,7 +305,7 @@ void GLView::handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[])
             
             CCLOGINFO("x = %f y = %f", touch->getLocationInView().x, touch->getLocationInView().y);
             
-            g_touchIdReorderMap.insert(std::make_pair(id, unusedIndex));
+            getTouchIdReorderMap().insert(std::make_pair(id, unusedIndex));
             touchEvent._touches.push_back(touch);
         }
     }
@@ -330,8 +334,8 @@ void GLView::handleTouchesMove(int num, intptr_t ids[], float xs[], float ys[])
         x = xs[i];
         y = ys[i];
 
-        auto iter = g_touchIdReorderMap.find(id);
-        if (iter == g_touchIdReorderMap.end())
+        auto iter = getTouchIdReorderMap().find(id);
+        if (iter == getTouchIdReorderMap().end())
         {
             CCLOG("if the index doesn't exist, it is an error");
             continue;
@@ -378,8 +382,8 @@ void GLView::handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num
         x = xs[i];
         y = ys[i];
 
-        auto iter = g_touchIdReorderMap.find(id);
-        if (iter == g_touchIdReorderMap.end())
+        auto iter = getTouchIdReorderMap().find(id);
+        if (iter == getTouchIdReorderMap().end())
         {
             CCLOG("if the index doesn't exist, it is an error");
             continue;
@@ -398,7 +402,7 @@ void GLView::handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num
             g_touches[iter->second] = nullptr;
             removeUsedIndexBit(iter->second);
 
-            g_touchIdReorderMap.erase(id);
+            getTouchIdReorderMap().erase(id);
         } 
         else
         {

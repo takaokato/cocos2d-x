@@ -975,7 +975,7 @@ void HttpClient::sendImmediate(HttpRequest* request)
     auto t = std::thread(&HttpClient::networkThreadAlone, this, request, response);
     t.detach();
 }
-	
+
 void HttpClient::sendImmediateUnsafe(HttpRequest* request)
 {
 	if(nullptr == request)
@@ -987,6 +987,16 @@ void HttpClient::sendImmediateUnsafe(HttpRequest* request)
 	
 	auto t = std::thread(&HttpClient::networkThreadAloneUnsafe, this, request);
 	t.detach();
+}
+    
+HttpResponse* HttpClient::sendImmediateSync(HttpRequest* request)
+{
+    HttpResponse *response = new (std::nothrow) HttpResponse(request);
+    char responseMessage[RESPONSE_BUFFER_SIZE] = { 0 };
+    processResponse(response, responseMessage);
+    
+    response->autorelease();
+    return response;
 }
 
 // Poll and notify main thread if responses exists in queue

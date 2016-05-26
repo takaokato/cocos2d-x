@@ -28,52 +28,120 @@ THE SOFTWARE.
 
 #include <android/log.h>
 #include <jni.h>
+#include <mutex>
 
 using namespace cocos2d;
+namespace {
+    const int MAX_TOUCH_NUM = 5;
+    class TouchEvents {
+    public:
+        TouchEvents()
+        {
+            count = 0;
+        }
+        void AddTouch(int _id, float _x, float _y)
+        {
+            if (count < MAX_TOUCH_NUM) {
+                id[count] = _id;
+                x[count] = _x;
+                y[count] = _y;
+                ++count;
+            }
+        }
+        void Clear()
+        {
+            count = 0;
+        }
+        int count;
+        int id[MAX_TOUCH_NUM];
+        float x[MAX_TOUCH_NUM];
+        float y[MAX_TOUCH_NUM];
+    };
+    static TouchEvents beginTouches;
+    static TouchEvents moveTouches;
+    static TouchEvents endTouches;
+    static TouchEvents cancelTouches;
+    static std::mutex mutex;
+}
+
+namespace cocos2d {
+    void ExecuteTouchEvents() {
+        if (0 < beginTouches.count) {
+            mutex.lock();
+            cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesBegin(
+                    beginTouches.count, beginTouches.id, beginTouches.x, beginTouches.y);
+            beginTouches.Clear();
+            mutex.unlock();
+        }
+        if (0 < moveTouches.count) {
+            mutex.lock();
+            cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesMove(moveTouches.count,
+                                                                                 moveTouches.id,
+                                                                                 moveTouches.x,
+                                                                                 moveTouches.y);
+            moveTouches.Clear();
+            mutex.unlock();
+        }
+        if (0 < cancelTouches.count) {
+            mutex.lock();
+            cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesCancel(
+                    cancelTouches.count, cancelTouches.id, cancelTouches.x, cancelTouches.y);
+            cancelTouches.Clear();
+            mutex.unlock();
+        }
+        if (0 < endTouches.count) {
+            mutex.lock();
+            cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesEnd(endTouches.count,
+                                                                                endTouches.id,
+                                                                                endTouches.x,
+                                                                                endTouches.y);
+            endTouches.Clear();
+            mutex.unlock();
+        }
+    }
+}
 
 extern "C" {
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y) {
-        intptr_t idlong = id;
-        cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesBegin(1, &idlong, &x, &y);
+        mutex.lock();
+        beginTouches.AddTouch(id, x, y);
+        mutex.unlock();
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(JNIEnv * env, jobject thiz, jint id, jfloat x, jfloat y) {
-        intptr_t idlong = id;
-        cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesEnd(1, &idlong, &x, &y);
+        mutex.lock();
+        endTouches.AddTouch(id, x, y);
+        mutex.unlock();
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(JNIEnv * env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys) {
+        mutex.lock();
         int size = env->GetArrayLength(ids);
-        jint id[size];
-        jfloat x[size];
-        jfloat y[size];
-
-        env->GetIntArrayRegion(ids, 0, size, id);
-        env->GetFloatArrayRegion(xs, 0, size, x);
-        env->GetFloatArrayRegion(ys, 0, size, y);
-
-        intptr_t idlong[size];
-        for(int i = 0; i < size; i++)
-            idlong[i] = id[i];
-
-        cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesMove(size, idlong, x, y);
+        jint* id = env->GetIntArrayElements(ids, NULL);
+        jfloat* x = env->GetFloatArrayElements(xs, NULL);
+        jfloat* y = env->GetFloatArrayElements(ys, NULL);
+        for (int i = 0; i < size; ++i) {
+            moveTouches.AddTouch(id[i], x[i], y[i]);
+        }
+        env->ReleaseFloatArrayElements(ys, y, JNI_ABORT);
+        env->ReleaseFloatArrayElements(xs, x, JNI_ABORT);
+        env->ReleaseIntArrayElements(ids, id, JNI_ABORT);
+        mutex.unlock();
     }
 
     JNIEXPORT void JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesCancel(JNIEnv * env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys) {
+        mutex.lock();
         int size = env->GetArrayLength(ids);
-        jint id[size];
-        jfloat x[size];
-        jfloat y[size];
-
-        env->GetIntArrayRegion(ids, 0, size, id);
-        env->GetFloatArrayRegion(xs, 0, size, x);
-        env->GetFloatArrayRegion(ys, 0, size, y);
-
-        intptr_t idlong[size];
-        for(int i = 0; i < size; i++)
-            idlong[i] = id[i];
-
-        cocos2d::Director::getInstance()->getOpenGLView()->handleTouchesCancel(size, idlong, x, y);
+        jint* id = env->GetIntArrayElements(ids, NULL);
+        jfloat* x = env->GetFloatArrayElements(xs, NULL);
+        jfloat* y = env->GetFloatArrayElements(ys, NULL);
+        for (int i = 0; i < size; ++i) {
+            cancelTouches.AddTouch(id[i], x[i], y[i]);
+        }
+        env->ReleaseFloatArrayElements(ys, y, JNI_ABORT);
+        env->ReleaseFloatArrayElements(xs, x, JNI_ABORT);
+        env->ReleaseIntArrayElements(ids, id, JNI_ABORT);
+        mutex.unlock();
     }
 
 #define KEYCODE_BACK 0x04
@@ -85,8 +153,9 @@ extern "C" {
 #define KEYCODE_ENTER 0x42
 #define KEYCODE_PLAY  0x7e
 #define KEYCODE_DPAD_CENTER  0x17
-    
-    
+
+#define THROW_EXCEPTION(env) env->ThrowNew(env->FindClass("java/lang/Exception"), "Unexpected error occurred."); throw
+
     static std::unordered_map<int, cocos2d::EventKeyboard::KeyCode> g_keyCodeMap = {
         { KEYCODE_BACK , cocos2d::EventKeyboard::KeyCode::KEY_ESCAPE},
         { KEYCODE_MENU , cocos2d::EventKeyboard::KeyCode::KEY_MENU},
@@ -101,16 +170,21 @@ extern "C" {
     };
     
     JNIEXPORT jboolean JNICALL Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyEvent(JNIEnv * env, jobject thiz, jint keyCode, jboolean isPressed) {
-        Director* pDirector = Director::getInstance();
-        
-        auto iterKeyCode = g_keyCodeMap.find(keyCode);
-        if (iterKeyCode == g_keyCodeMap.end()) {
-            return JNI_FALSE;
+        try {
+            Director *pDirector = Director::getInstance();
+
+            auto iterKeyCode = g_keyCodeMap.find(keyCode);
+            if (iterKeyCode == g_keyCodeMap.end()) {
+                return JNI_FALSE;
+            }
+
+            cocos2d::EventKeyboard::KeyCode cocos2dKey = g_keyCodeMap.at(keyCode);
+            cocos2d::EventKeyboard event(cocos2dKey, isPressed);
+            cocos2d::Director::getInstance()->getEventDispatcher()->dispatchEvent(&event);
+            return JNI_TRUE;
         }
-        
-        cocos2d::EventKeyboard::KeyCode cocos2dKey = g_keyCodeMap.at(keyCode);
-        cocos2d::EventKeyboard event(cocos2dKey, isPressed);
-        cocos2d::Director::getInstance()->getEventDispatcher()->dispatchEvent(&event);
-        return JNI_TRUE;
+        catch (...) {
+            THROW_EXCEPTION(env);
+        }
         
     }}

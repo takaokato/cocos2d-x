@@ -42,8 +42,8 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     // ===========================================================
 
     private long mLastTickInNanoSeconds;
-    private int mScreenWidth;
-    private int mScreenHeight;
+    private int mScreenWidth = 0;
+    private int mScreenHeight = 0;
     private boolean mNativeInitCompleted = false;
 
     // ===========================================================

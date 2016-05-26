@@ -1533,11 +1533,11 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                                  * use Trace.beginSection/Trace.endSection instead.
                                  */
                                 //Trace.traceBegin(Trace.TRACE_TAG_VIEW, "onSurfaceCreated");
-                                Trace.beginSection("GLSurfaceView::onSurfaceCreated");
+                                //Trace.beginSection("GLSurfaceView::onSurfaceCreated");
                                 view.mRenderer.onSurfaceCreated(gl, mEglHelper.mEglConfig);
                             } finally {
                                 //Trace.traceEnd(Trace.TRACE_TAG_VIEW);
-                                Trace.endSection();
+                                //Trace.endSection();
                             }
                         }
                         createEglContext = false;
@@ -1556,11 +1556,11 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                                  * use Trace.beginSection/Trace.endSection instead.
                                  */
                                 //Trace.traceBegin(Trace.TRACE_TAG_VIEW, "onSurfaceChanged");
-                                Trace.beginSection("GLSurfaceView::onSurfaceChanged");
+                                //Trace.beginSection("GLSurfaceView::onSurfaceChanged");
                                 view.mRenderer.onSurfaceChanged(gl, w, h);
                             } finally {
                                 //Trace.traceEnd(Trace.TRACE_TAG_VIEW);
-                                Trace.endSection();
+                                //Trace.endSection();
                             }
                         }
                         sizeChanged = false;
@@ -1579,11 +1579,11 @@ public class GLSurfaceView extends SurfaceView implements SurfaceHolder.Callback
                                  * use Trace.beginSection/Trace.endSection instead.
                                  */
                                 //Trace.traceBegin(Trace.TRACE_TAG_VIEW, "onDrawFrame");
-                                Trace.beginSection("GLSurfaceView::onDrawFrame");
+                                //Trace.beginSection("GLSurfaceView::onDrawFrame");
                                 view.mRenderer.onDrawFrame(view, gl);
                             } finally {
                                 //Trace.traceEnd(Trace.TRACE_TAG_VIEW);
-                                Trace.endSection();
+                                //Trace.endSection();
                             }
                         }
                     }
