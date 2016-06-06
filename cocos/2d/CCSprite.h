@@ -407,9 +407,9 @@ public:
     /**
      * returns a reference of the polygon information associated with this sprite
      *
-     * @return a copy of PolygonInfo
+     * @return a reference of PolygonInfo
      */
-    PolygonInfo& getPolygonInfo();
+    const PolygonInfo& getPolygonInfo() const;
 
     /**
      * set the sprite to use this new PolygonInfo
@@ -468,7 +468,9 @@ public:
     virtual void setScale(float scale) override;
     virtual void setPositionZ(float positionZ) override;
     virtual void setAnchorPoint(const Vec2& anchor) override;
-    virtual void ignoreAnchorPointForPosition(bool value) override;
+    
+    virtual void setIgnoreAnchorPointForPosition(bool value) override;
+    
     virtual void setVisible(bool bVisible) override;
     virtual void draw(Renderer *renderer, const Mat4 &transform, uint32_t flags) override;
     virtual void setOpacityModifyRGB(bool modify) override;
@@ -477,14 +479,17 @@ public:
 	void setTransparentFlag(bool isTransparent);
 	bool getTransparentFlag() const { return _trianglesCommand.isTransparent(); }
 
-CC_CONSTRUCTOR_ACCESS:
+    int getResourceType() const { return _fileType; }
+    const std::string& getResourceName() const { return _fileName; }
+
+CC_CONSTRUCTOR_ACCESS :
 	/**
      * @js ctor
      */
     Sprite();
     virtual ~Sprite();
 
-    /* Initializes an empty sprite with nothing init. */
+    /* Initializes an empty sprite with no parameters. */
     virtual bool init() override;
 
     /**
@@ -637,6 +642,10 @@ protected:
     bool _flippedY;                         /// Whether the sprite is flipped vertically or not
 
     bool _insideBounds;                     /// whether or not the sprite was inside bounds the previous frame
+
+    std::string _fileName;
+    int _fileType;
+
 private:
     CC_DISALLOW_COPY_AND_ASSIGN(Sprite);
 };

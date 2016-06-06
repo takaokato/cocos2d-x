@@ -282,7 +282,7 @@ public:
     // Override
     //
     /** TMXLayer doesn't support adding a Sprite manually.
-     @warning addchild(z, tag); is not supported on TMXLayer. Instead of setTileGID.
+     @warning addChild(z, tag); is not supported on TMXLayer. Instead of setTileGID.
      */
     using SpriteBatchNode::addChild;
     virtual void addChild(Node * child, int zOrder, int tag) override;
@@ -305,10 +305,10 @@ protected:
     Sprite* insertTileForGID(uint32_t gid, const Vec2& pos);
     Sprite* updateTileForGID(uint32_t gid, const Vec2& pos);
 
-    /* The layer recognizes some special properties, like cc_vertez */
+    /* The layer recognizes some special properties, like cc_vertexz */
     void parseInternalProperties();
-    void setupTileSprite(Sprite* sprite, Vec2 pos, int gid);
-    Sprite* reusedTileWithRect(Rect rect);
+    void setupTileSprite(Sprite* sprite, const Vec2& pos, int gid);
+    Sprite* reusedTileWithRect(const Rect& rect);
     int getVertexZForPos(const Vec2& pos);
 
     // index

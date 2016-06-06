@@ -5,7 +5,9 @@ LOCAL_MODULE := cocosbuilder_static
 
 LOCAL_MODULE_FILENAME := libcocosbuilder
 
-LOCAL_CPPFLAGS += -frtti
+ifeq ($(USE_ARM_MODE),1)
+LOCAL_ARM_MODE := arm
+endif
 
 LOCAL_SRC_FILES := CCBAnimationManager.cpp \
 CCBFileLoader.cpp \

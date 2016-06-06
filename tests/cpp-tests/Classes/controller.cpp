@@ -26,9 +26,7 @@ public:
         addTest("Actions - Progress", [](){return new (std::nothrow) ActionsProgressTests(); });
         addTest("Allocator - Basic", [](){return new (std::nothrow) AllocatorTests(); });
         addTest("Audio - CocosDenshion", []() { return new (std::nothrow) CocosDenshionTests(); });
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT || CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID || CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC || CC_TARGET_PLATFORM == CC_PLATFORM_WIN32)
         addTest("Audio - NewAudioEngine", []() { return new (std::nothrow) AudioEngineTests(); });
-#endif
 #if CC_ENABLE_BOX2D_INTEGRATION
         addTest("Box2d - Basic", []() { return new (std::nothrow) Box2DTests(); });
         addTest("Box2d - TestBed", []() { return new (std::nothrow) Box2dTestBedSuite(); });
@@ -43,7 +41,6 @@ public:
         addTest("Curl", []() { return new CurlTests(); });
 #endif
         addTest("Current Language", []() { return new CurrentLanguageTests(); });
-        addTest("CocosStudio3D Test", []() { return new CocosStudio3DTests(); });
         addTest("Downloader Test", []() { return new DownloaderTests(); });
         addTest("EventDispatcher", []() { return new EventDispatcherTests(); });
         addTest("Effects - Advanced", []() { return new EffectAdvanceTests(); });
@@ -52,6 +49,9 @@ public:
         addTest("FileUtils", []() { return new FileUtilsTests(); });
         addTest("Fonts", []() { return new FontTests(); });
         addTest("Interval", [](){return new IntervalTests(); });
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+        addTest("JNIHelper", []() { return new JNITests(); });
+#endif
         addTest("Material System", [](){return new MaterialSystemTest(); });
         addTest("Navigation Mesh", [](){return new NavMeshTests(); });
         addTest("Node: BillBoard Test", [](){  return new BillBoardTests(); });
@@ -101,6 +101,7 @@ public:
         addTest("UserDefault", []() { return new UserDefaultTests(); });
         addTest("Vibrate", []() { return new VibrateTests(); });
         addTest("Zwoptex", []() { return new ZwoptexTests(); });
+        addTest("SpriteFrameCache", []() { return new SpriteFrameCacheTests(); });
     }
 };
 

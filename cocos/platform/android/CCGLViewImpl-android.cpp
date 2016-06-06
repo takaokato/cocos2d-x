@@ -26,12 +26,10 @@ THE SOFTWARE.
 #include "platform/CCPlatformConfig.h"
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 
-#include "CCGLViewImpl-android.h"
+#include "platform/android/CCGLViewImpl-android.h"
 #include "base/CCDirector.h"
 #include "base/ccMacros.h"
-#include "jni/IMEJni.h"
-#include "jni/JniHelper.h"
-#include "jni/Java_org_cocos2dx_lib_Cocos2dxHelper.h"
+#include "platform/android/jni/JniHelper.h"
 #include "CCGL.h"
 
 #include <stdlib.h>
@@ -118,7 +116,7 @@ bool GLViewImpl::isOpenGLReady()
 
 void GLViewImpl::end()
 {
-    terminateProcessJNI();
+    JniHelper::callStaticVoidMethod("org/cocos2dx/lib/Cocos2dxHelper", "terminateProcess");
 }
 
 void GLViewImpl::swapBuffers()
@@ -127,7 +125,7 @@ void GLViewImpl::swapBuffers()
 	static jclass classObj = nullptr;
 	static jmethodID methodID;
 	if (classObj == nullptr) {
-		classObj = pEnv->FindClass("org.cocos2dx.lib.GLSurfaceView");
+		classObj = pEnv->FindClass("org/cocos2dx/lib/GLSurfaceView");
 		jboolean hasException = pEnv->ExceptionCheck();
 		if (hasException) {
 			__android_log_print(ANDROID_LOG_ERROR, "cocos2dx", "An exception occurred when finding org.cocos2dx.lib.GLSurfaceView class");
@@ -146,7 +144,11 @@ void GLViewImpl::swapBuffers()
 
 void GLViewImpl::setIMEKeyboardState(bool bOpen)
 {
-    setKeyboardStateJNI((int)bOpen);
+    if (bOpen) {
+        JniHelper::callStaticVoidMethod("org/cocos2dx/lib/Cocos2dxGLSurfaceView", "openIMEKeyboard");
+    } else {
+        JniHelper::callStaticVoidMethod("org/cocos2dx/lib/Cocos2dxGLSurfaceView", "closeIMEKeyboard");
+    }
 }
 
 NS_CC_END

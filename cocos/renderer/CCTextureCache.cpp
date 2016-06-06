@@ -153,7 +153,7 @@ void TextureCache::addImageAsync(const std::string &path, const std::function<vo
     if (_loadingThread == nullptr)
     {
         // create a new thread to load images
-        _loadingThread = new std::thread(&TextureCache::loadImage, this);
+        _loadingThread = new (std::nothrow) std::thread(&TextureCache::loadImage, this);
         _needQuit = false;
     }
 
@@ -360,6 +360,8 @@ Texture2D * TextureCache::addImage(const std::string &path)
             else
             {
                 CCLOG("cocos2d: Couldn't create texture for file:%s in TextureCache", path.c_str());
+                CC_SAFE_RELEASE(texture);
+                texture = nullptr;
             }
         } while (0);
     }
@@ -499,7 +501,7 @@ void TextureCache::removeUnusedTextures()
             CCLOG("cocos2d: TextureCache: removing unused texture: %s", it->first.c_str());
 
             tex->release();
-            _textures.erase(it++);
+            it = _textures.erase(it);
         } else {
             ++it;
         }
@@ -516,8 +518,8 @@ void TextureCache::removeTexture(Texture2D* texture)
 
     for( auto it=_textures.cbegin(); it!=_textures.cend(); /* nothing */ ) {
         if( it->second == texture ) {
-            texture->release();
-            _textures.erase(it++);
+            it->second->release();
+            it = _textures.erase(it);
             break;
         } else
             ++it;
@@ -535,7 +537,7 @@ void TextureCache::removeTextureForKey(const std::string &textureKeyName)
     }
 
     if( it != _textures.end() ) {
-        (it->second)->release();
+        it->second->release();
         _textures.erase(it);
     }
 }
@@ -563,7 +565,7 @@ void TextureCache::reloadAllTextures()
 // #endif
 }
 
-const std::string TextureCache::getTextureFilePath( cocos2d::Texture2D *texture )const
+std::string TextureCache::getTextureFilePath(cocos2d::Texture2D* texture) const
 {
     for(auto& item : _textures)
     {
@@ -621,6 +623,35 @@ std::string TextureCache::getCachedTextureInfo() const
     return buffer;
 }
 
+void TextureCache::renameTextureWithKey(const std::string& srcName, const std::string& dstName)
+{
+    std::string key = srcName;
+    auto it = _textures.find(key);
+
+    if( it == _textures.end() ) {
+        key = FileUtils::getInstance()->fullPathForFilename(srcName);
+        it = _textures.find(key);
+    }
+
+    if( it != _textures.end() ) {
+        std::string fullpath = FileUtils::getInstance()->fullPathForFilename(dstName);
+        Texture2D* tex = it->second;
+
+        Image* image = new (std::nothrow) Image();
+        if (image)
+        {
+            bool ret = image->initWithImageFile(dstName);
+            if (ret)
+            {
+                tex->initWithImage(image);
+                _textures.insert(std::make_pair(fullpath, tex));
+                _textures.erase(it);
+            }
+            CC_SAFE_DELETE(image);
+        }
+    }
+}
+
 #if CC_ENABLE_CACHE_TEXTURE_DATA
 
 std::list<VolatileTexture*> VolatileTextureMgr::_textures;
@@ -675,7 +706,7 @@ void VolatileTextureMgr::addTextureReloadFunc(Texture2D *tt, const std::string& 
 
 VolatileTexture* VolatileTextureMgr::findVolotileTexture(Texture2D *tt)
 {
-    VolatileTexture *vt = 0;
+    VolatileTexture *vt = nullptr;
     auto i = _textures.begin();
     while (i != _textures.end())
     {

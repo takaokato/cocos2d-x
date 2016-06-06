@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 
-#include "CCFrame.h"
-#include "CCTimeLine.h"
-#include "CCActionTimeline.h"
+#include "editor-support/cocostudio/ActionTimeline/CCFrame.h"
+#include "editor-support/cocostudio/ActionTimeline/CCTimeLine.h"
+#include "editor-support/cocostudio/ActionTimeline/CCActionTimeline.h"
 #include "2d/CCSpriteFrameCache.h"
 #include "2d/CCSpriteFrame.h"
 #include <exception>
@@ -618,44 +618,35 @@ void InnerActionFrame::onEnter(Frame *nextFrame, int currentFrameIndex)
 
 void InnerActionFrame::setStartFrameIndex(int frameIndex)
 {
-#ifdef CC_STUDIO_ENABLED_VIEW   // for cocostudio only
     if (_enterWithName)
     {
         CCLOG(" cannot set start when enter frame with name. setEnterWithName false firstly!");
-        throw std::exception();
+        return;
     }
-#else
-    CCASSERT(!_enterWithName, " cannot setStartFrameIndex when enterWithName is set");
-#endif
+
     _startFrameIndex = frameIndex;
 }
 
 
 void InnerActionFrame::setEndFrameIndex(int frameIndex)
 {
-#ifdef CC_STUDIO_ENABLED_VIEW   // for cocostudio only
     if (_enterWithName)
     {
         CCLOG(" cannot set end when enter frame with name. setEnterWithName false firstly!");
-        throw std::exception();
+        return;
     }
-#else
-    CCASSERT(!_enterWithName, " cannot setEndFrameIndex when enterWithName is set");
-#endif
+
     _endFrameIndex = frameIndex;
 }
 
 void InnerActionFrame::setAnimationName(const std::string& animationName)
 {
-#ifdef CC_STUDIO_ENABLED_VIEW   // for cocostudio only
     if (!_enterWithName)
     {
         CCLOG(" cannot set aniamtioname when enter frame with index. setEnterWithName true firstly!");
-        throw std::exception();
+        return;
     }
-#else
-    CCASSERT(_enterWithName, " cannot set aniamtioname when enter frame with index. setEnterWithName true firstly!");
-#endif
+
     _animationName = animationName;
    
 }
@@ -916,5 +907,47 @@ Frame* BlendFuncFrame::clone()
     return frame;
 }
 
+//PlayableFrame
+const std::string PlayableFrame::START_ACT = "start";
+const std::string PlayableFrame::STOP_ACT = "stop";
+const std::string PlayableFrame::PLAYABLE_EXTENTION = "playable_extension";
+PlayableFrame* PlayableFrame::create()
+{
+    auto frame = new (std::nothrow) PlayableFrame();
+    if(frame)
+    {
+        frame->autorelease();
+        return frame;
+    }
+    CC_SAFE_DELETE(frame);
+    return nullptr;
+}
 
+PlayableFrame::PlayableFrame()
+    : _playableAct("")
+{
+    
+}
+
+void PlayableFrame::onEnter(Frame *nextFrame, int currentFrameINdex)
+{
+    auto playableNode = dynamic_cast<PlayableProtocol*>(_node);
+    if (nullptr == playableNode) // may be a playable component
+        playableNode = dynamic_cast<PlayableProtocol*>(_node->getComponent(PLAYABLE_EXTENTION));
+    if (nullptr == playableNode)
+        return;
+
+    if(_playableAct == START_ACT)
+        playableNode->start();
+    else if(_playableAct == STOP_ACT)
+        playableNode->stop();
+}
+
+Frame* PlayableFrame::clone()
+{
+    PlayableFrame* frame = PlayableFrame::create();
+    frame->cloneProperty(this);
+    frame->setPlayableAct(_playableAct);
+    return frame;
+}
 NS_TIMELINE_END

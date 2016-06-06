@@ -25,8 +25,8 @@ THE SOFTWARE.
 #include "platform/CCPlatformConfig.h"
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 
-#include "CCApplication-android.h"
-#include "CCGLViewImpl-android.h"
+#include "platform/android/CCApplication-android.h"
+#include "platform/android/CCGLViewImpl-android.h"
 #include "base/CCDirector.h"
 #include "base/CCEventCustom.h"
 #include "base/CCEventType.h"
@@ -87,7 +87,7 @@ JNIEXPORT void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeInit(JNIEnv*  env, j
         	director->getEventDispatcher()->dispatchEvent(&recreatedEvent);
         	director->setGLDefaultValues();
     	}
-    	cocos2d::network::_preloadJavaDownloaderClass();
+    	//cocos2d::network::_preloadJavaDownloaderClass();
     }
     catch (...) {
         THROW_EXCEPTION(env);

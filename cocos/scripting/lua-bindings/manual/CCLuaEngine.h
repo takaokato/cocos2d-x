@@ -30,11 +30,13 @@ extern "C" {
 #include "lua.h"
 }
 
-#include "cocos2d.h"
+
 #include "base/CCScriptSupport.h"
-#include "CCLuaStack.h"
-#include "CCLuaValue.h"
-#include "cocos2d/LuaScriptHandlerMgr.h"
+#include "scripting/lua-bindings/manual/CCLuaStack.h"
+#include "scripting/lua-bindings/manual/CCLuaValue.h"
+#include "scripting/lua-bindings/manual/cocos2d/LuaScriptHandlerMgr.h"
+#include "scripting/lua-bindings/manual/Lua-BindingsExport.h"
+#include "deprecated/CCNotificationCenter.h"
 
 /**
  * @addtogroup lua
@@ -49,7 +51,7 @@ NS_CC_BEGIN
  * @lua NA
  * @js NA
  */
-class LuaEngine : public ScriptEngineProtocol
+class CC_LUA_DLL LuaEngine : public ScriptEngineProtocol
 {
 public:
     /**

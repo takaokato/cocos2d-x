@@ -109,7 +109,7 @@ public:
      * @param renderer The renderer use to render the scene.
      * @js NA
      */
-    void render(Renderer* renderer);
+    virtual void render(Renderer* renderer);
 
 	virtual bool isSceneDirty() const;
 	virtual void setSceneDirty() override;
