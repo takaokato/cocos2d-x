@@ -12,14 +12,24 @@ model {
             versionName "1.0"
         }
     }
-    android.sources {
-        main {
-            aidl.source.srcDir "../java/src"
-            java.source.srcDir "../java/src"
-            java.source.exclude "**/Cocos2dxDownloader.java"
-            manifest {
-                source {
-                    srcDir "."
+    android {
+        sources {
+            main {
+                aidl {
+                    source {
+                        srcDir "../java/src"
+                    }
+                }
+                java {
+                    source {
+                        srcDir "../java/src"
+                        exclude "**/Cocos2dxDownloader.java"
+                    }
+                }
+                manifest {
+                    source {
+                        srcDir "."
+                    }
                 }
             }
         }
