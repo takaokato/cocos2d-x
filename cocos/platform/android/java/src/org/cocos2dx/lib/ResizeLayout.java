@@ -65,7 +65,7 @@ public class ResizeLayout extends FrameLayout {
         super.onLayout(changed, l, t, r, b);
         if(mForceLayoutHandler != null){
             /*This is a hot-fix for some android devices which don't do layout when the main window
-            * is paned.  We refersh the layout in 24 frames per seconds.
+            * is paned. We refresh the layout in 24 frames per seconds.
             * When the editBox is lose focus or when user begin to type, the do layout is disabled.
             */
             mForceLayoutHandler.postDelayed(mForceLayoutFunc, 1000 / 24);

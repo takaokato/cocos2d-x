@@ -188,7 +188,7 @@ class SetEnvVar(object):
 
         file = open(self.file_used_for_setup, 'a')
         file.write('\n# Add environment variable %s for cocos2d-x\n' % key)
-        file.write('export %s=%s\n' % (key, value))
+        file.write('export %s="%s"\n' % (key, value))
         file.write('export PATH=$%s:$PATH\n' % key)
         if key == ANDROID_SDK_ROOT:
             file.write(
@@ -356,7 +356,11 @@ class SetEnvVar(object):
         if not ndk_root:
             return False
 
-        ndk_build_path = os.path.join(ndk_root, 'ndk-build')
+        if self._isWindows():
+            ndk_build_path = os.path.join(ndk_root, 'ndk-build.cmd')
+        else:
+            ndk_build_path = os.path.join(ndk_root, 'ndk-build')
+
         if os.path.isfile(ndk_build_path):
             return True
         else:

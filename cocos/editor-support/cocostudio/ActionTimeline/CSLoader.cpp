@@ -26,12 +26,12 @@
 
 #include "base/ObjectFactory.h"
 #include "base/CCDirector.h"
+#include "base/ccUTF8.h"
 #include "ui/CocosGUI.h"
 #include "2d/CCSpriteFrameCache.h"
 #include "2d/CCParticleSystemQuad.h"
 #include "2d/CCTMXTiledMap.h"
 #include "platform/CCFileUtils.h"
-#include "deprecated/CCString.h"
 
 #include "editor-support/cocostudio/ActionTimeline/CCActionTimelineCache.h"
 #include "editor-support/cocostudio/ActionTimeline/CCActionTimeline.h"
@@ -329,11 +329,9 @@ Node* CSLoader::createNodeWithVisibleSize(const std::string &filename, const ccN
 
 std::string CSLoader::getExtentionName(const std::string& name)
 {
-    std::string result = "";
-
     std::string path = name;
     size_t pos = path.find_last_of('.');
-    result = path.substr(pos + 1, path.length());
+    std::string result = path.substr(pos + 1, path.length());
 
     return result;
 }

@@ -1,6 +1,6 @@
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -33,11 +33,18 @@ THE SOFTWARE.
 #include "android/asset_manager.h"
 #include "android/asset_manager_jni.h"
 #include "base/ZipUtils.h"
+#include "base/CCDirector.h"
+#include "base/CCEventDispatcher.h"
+#include "base/CCEventType.h"
+
 #include <stdlib.h>
 #include <sys/stat.h>
 
 #define  LOG_TAG    "CCFileUtils-android.cpp"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+
+#define  ASSETS_FOLDER_NAME          "assets/"
+#define  ASSETS_FOLDER_NAME_LENGTH   7
 
 using namespace std;
 
@@ -85,7 +92,7 @@ FileUtilsAndroid::~FileUtilsAndroid()
 
 bool FileUtilsAndroid::init()
 {
-    _defaultResRootPath = "assets/";
+    _defaultResRootPath = ASSETS_FOLDER_NAME;
     
     std::string assetsPath(getApkPath());
     if (assetsPath.find("/obb/") != std::string::npos)
@@ -201,11 +208,7 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath) cons
     }
 
     const char* s = dirPath.c_str();
-    bool startWithAssets = (dirPath.find("assets/") == 0);
-    int lenOfAssets = 7;
-
-    std::string tmpStr;
-
+    
     // find absolute path in flash memory
     if (s[0] == '/')
     {
@@ -216,23 +219,26 @@ bool FileUtilsAndroid::isDirectoryExistInternal(const std::string& dirPath) cons
             return S_ISDIR(st.st_mode);
         }
     }
-
-    // find it in apk's assets dir
-    // Found "assets/" at the beginning of the path and we don't want it
-    CCLOG("find in apk dirPath(%s)", s);
-    if (startWithAssets)
+    else
     {
-        s += lenOfAssets;
-    }
-    if (FileUtilsAndroid::assetmanager)
-    {
-        AAssetDir* aa = AAssetManager_openDir(FileUtilsAndroid::assetmanager, s);
-        if (aa && AAssetDir_getNextFileName(aa))
+        // find it in apk's assets dir
+        // Found "assets/" at the beginning of the path and we don't want it
+        CCLOG("find in apk dirPath(%s)", s);
+        if (dirPath.find(ASSETS_FOLDER_NAME) == 0)
         {
-            AAssetDir_close(aa);
-            return true;
+            s += ASSETS_FOLDER_NAME_LENGTH;
+        }
+        if (FileUtilsAndroid::assetmanager)
+        {
+            AAssetDir* aa = AAssetManager_openDir(FileUtilsAndroid::assetmanager, s);
+            if (aa && AAssetDir_getNextFileName(aa))
+            {
+                AAssetDir_close(aa);
+                return true;
+            }
         }
     }
+    
     return false;
 }
 
@@ -249,8 +255,36 @@ bool FileUtilsAndroid::isAbsolutePath(const std::string& strPath) const
     return false;
 }
 
+long FileUtilsAndroid::getFileSize(const std::string& filepath)
+{
+    long size = FileUtils::getFileSize(filepath);
+    if (size != -1) {
+        return size;
+    }
+    
+    if (FileUtilsAndroid::assetmanager)
+    {
+        string relativePath = filepath;
+        if (filepath.find(_defaultResRootPath) == 0)
+        {
+            relativePath = filepath.substr(_defaultResRootPath.size());
+        }
+        
+        AAsset* asset = AAssetManager_open(FileUtilsAndroid::assetmanager, relativePath.data(), AASSET_MODE_UNKNOWN);
+        if (asset)
+        {
+            size = AAsset_getLength(asset);
+            AAsset_close(asset);
+        }
+    }
+    
+    return size;
+}
+
 FileUtils::Status FileUtilsAndroid::getContents(const std::string& filename, ResizableBuffer* buffer)
 {
+    Director::getInstance()->getEventDispatcher()->dispatchCustomEvent(EVENT_BEFORE_READ_FILE);
+
     static const std::string apkprefix("assets/");
     if (filename.empty())
         return FileUtils::Status::NotExists;
@@ -295,7 +329,7 @@ FileUtils::Status FileUtilsAndroid::getContents(const std::string& filename, Res
     if (readsize < size) {
         if (readsize >= 0)
             buffer->resize(readsize);
-        return FileUtils::Status::ReadFaild;
+        return FileUtils::Status::ReadFailed;
     }
 
     return FileUtils::Status::OK;

@@ -1,6 +1,6 @@
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2014 Chukong Technologies
+Copyright (c) 2013-2017 Chukong Technologies
 
 http://www.cocos2d-x.org
 
@@ -38,7 +38,7 @@ THE SOFTWARE.
 #endif
 #if CC_REF_LEAK_DETECTION
 #include <stddef.h>
-#include <list>
+#include <vector>
 #endif
 
 /**
@@ -171,16 +171,6 @@ public:
      When true, it means that the object was already rooted.
      */
     bool _rooted;
-    unsigned int _referenceCountAtRootTime;
-
-    /**
-     * The life of the object is scrolled by the scripting engine.
-     *
-     * When the object is controlled by the scripting engine
-     * some additional logic is performed, like Rooting/Unrooting
-     * the object when retain/release is called.
-     */
-    bool _scriptOwned;
 #endif
 
     // Memory leak diagnostic data (only included when CC_REF_LEAK_DETECTION is defined and its value isn't zero)
@@ -189,7 +179,7 @@ public:
     static void printLeaks();
 	static size_t getObjectCount();
 	static void initObjectListMutex();
-	static const std::list<Ref*>& lockObjectList();
+	static const std::vector<Ref*>& lockObjectList();
 	static void unlockObjectList();
 #endif
 };

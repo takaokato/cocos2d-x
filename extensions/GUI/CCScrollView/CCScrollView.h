@@ -196,6 +196,7 @@ public:
 
     void setTouchEnabled(bool enabled);
 	bool isTouchEnabled() const;
+    void setSwallowTouches(bool needSwallow);
     bool isDragging() const {return _dragging;}
     bool isTouchMoved() const { return _touchMoved; }
     bool isBounceable() const { return _bounceable; }
@@ -259,7 +260,7 @@ public:
 
     virtual void removeAllChildren() override;
     virtual void removeAllChildrenWithCleanup(bool cleanup) override;
-    virtual void removeChild(Node* child, bool cleaup = true) override;
+    virtual void removeChild(Node* child, bool cleanup = true) override;
     /**
      * CCActionTweenDelegate
      */

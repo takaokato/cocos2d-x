@@ -27,10 +27,14 @@ THE SOFTWARE.
 #include "base/ccUtils.h"
 
 static const char* CIRCLE_IMAGE = "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAQAAADZc7J/AAAA8ElEQVRIx62VyRGCQBBF+6gWRCEmYDIQkhiBCgHhSclC8YqWzOV5oVzKAYZp3r1/9fpbxAIBMTsKrjx5cqVgR0wgLhCRUWOjJiPqD56xoaGPhpRZV/iSEy6crHmw5oIrF9b/lVeMofrJgjlnxlIy/wik+JB+mme8BExbBhm+5CJC2LE2LtSEQoyGWDioBA5CoRIohJtK4CYDxzNEM4GAugR1E9VjVC+SZpXvhCJCrjomESLvc17pDGX7bWmlh6UtpjPVCWy9zaJ0TD7qfm3pwERMz2trRVZk3K3BD/L34AY+dEDCniMVBkPFkT2J/b2/AIV+dRpFLOYoAAAAAElFTkSuQmCC";
+static const char* CIRCLE_IMAGE_KEY = "/__circleImage";
 
 NS_CC_BEGIN
 
-static const float SPACE_BETWEEN_INDEX_NODES_DEFAULT = 23;
+namespace {
+    static const float SPACE_BETWEEN_INDEX_NODES_DEFAULT = 23;
+    static const GLubyte INDEX_NODES_OPACITY_DEFAULT = 0.3*255;
+}
 
 namespace ui {
 
@@ -49,9 +53,11 @@ PageViewIndicator* PageViewIndicator::create()
 PageViewIndicator::PageViewIndicator()
 : _direction(PageView::Direction::HORIZONTAL)
 , _currentIndexNode(nullptr)
+, _currentOverlappingIndexNode(nullptr)
 , _spaceBetweenIndexNodes(SPACE_BETWEEN_INDEX_NODES_DEFAULT)
 , _indexNodesScale(1.0f)
 , _indexNodesColor(Color3B::WHITE)
+, _indexNodesOpacity(INDEX_NODES_OPACITY_DEFAULT)
 , _useDefaultTexture(true)
 , _indexNodesTextureFile("")
 , _indexNodesTexType(Widget::TextureResType::LOCAL)
@@ -64,7 +70,7 @@ PageViewIndicator::~PageViewIndicator()
 
 bool PageViewIndicator::init()
 {
-    _currentIndexNode = utils::createSpriteFromBase64(CIRCLE_IMAGE);
+    _currentIndexNode = utils::createSpriteFromBase64Cached(CIRCLE_IMAGE, CIRCLE_IMAGE_KEY);
     _currentIndexNode->setVisible(false);
     addProtectedChild(_currentIndexNode, 1);
     return true;
@@ -96,7 +102,14 @@ void PageViewIndicator::indicate(ssize_t index)
     {
         return;
     }
-    _currentIndexNode->setPosition(_indexNodes.at(index)->getPosition());
+    Sprite* oldOverlappingNode = _currentOverlappingIndexNode;
+    _currentOverlappingIndexNode = _indexNodes.at(index);
+    if ( oldOverlappingNode != _currentOverlappingIndexNode ) {
+        if ( oldOverlappingNode )
+            oldOverlappingNode->setVisible(true);
+        _currentOverlappingIndexNode->setVisible(false);
+        _currentIndexNode->setPosition(_currentOverlappingIndexNode->getPosition());
+    }
 }
 
 void PageViewIndicator::rearrange()
@@ -116,7 +129,7 @@ void PageViewIndicator::rearrange()
     float totalSizeValue = sizeValue * numberOfItems + _spaceBetweenIndexNodes * (numberOfItems - 1);
 
     float posValue = -(totalSizeValue / 2) + (sizeValue / 2);
-    for(auto indexNode : _indexNodes) {
+    for(auto& indexNode : _indexNodes) {
         Vec2 position;
         if(horizontal)
         {
@@ -146,9 +159,15 @@ void PageViewIndicator::setIndexNodesColor(const Color3B& indexNodesColor)
 {
     _indexNodesColor = indexNodesColor;
     
-    for(auto indexNode : _indexNodes) {
+    for(auto& indexNode : _indexNodes) {
         indexNode->setColor(indexNodesColor);
     }
+}
+    
+void PageViewIndicator::setIndexNodesOpacity(GLubyte opacity) {
+    _indexNodesOpacity = opacity;
+    for ( auto& indexNode : _indexNodes )
+        indexNode->setOpacity(opacity);
 }
 
 void PageViewIndicator::setIndexNodesScale(float indexNodesScale)
@@ -160,7 +179,7 @@ void PageViewIndicator::setIndexNodesScale(float indexNodesScale)
     _indexNodesScale = indexNodesScale;
     
     _currentIndexNode->setScale(indexNodesScale);
-    for(auto indexNode : _indexNodes) {
+    for(auto& indexNode : _indexNodes) {
         indexNode->setScale(_indexNodesScale);
     }
     
@@ -177,13 +196,13 @@ void PageViewIndicator::setIndexNodesTexture(const std::string& texName, Widget:
     {
         case Widget::TextureResType::LOCAL:
             _currentIndexNode->setTexture(texName);
-            for(auto indexNode : _indexNodes) {
+            for(auto& indexNode : _indexNodes) {
                 indexNode->setTexture(texName);
             }
             break;
         case Widget::TextureResType::PLIST:
             _currentIndexNode->setSpriteFrame(texName);
-            for(auto indexNode : _indexNodes) {
+            for(auto& indexNode : _indexNodes) {
                 indexNode->setSpriteFrame(texName);
             }
             break;
@@ -196,6 +215,10 @@ void PageViewIndicator::setIndexNodesTexture(const std::string& texName, Widget:
     
 void PageViewIndicator::increaseNumberOfPages()
 {
+    if ( _currentOverlappingIndexNode ) {
+        _currentOverlappingIndexNode->setVisible(true);
+        _currentOverlappingIndexNode = nullptr;
+    }
     Sprite* indexNode;
     
     if(_useDefaultTexture)
@@ -219,13 +242,17 @@ void PageViewIndicator::increaseNumberOfPages()
     
     indexNode->setColor(_indexNodesColor);
     indexNode->setScale(_indexNodesScale);
-//    indexNode->setOpacity(255 * 0.3f);
+    indexNode->setOpacity(_indexNodesOpacity);
     addProtectedChild(indexNode);
     _indexNodes.pushBack(indexNode);
 }
 
 void PageViewIndicator::decreaseNumberOfPages()
 {
+    if ( _currentOverlappingIndexNode ) {
+        _currentOverlappingIndexNode->setVisible(true);
+        _currentOverlappingIndexNode = nullptr;
+    }
     if(_indexNodes.empty())
     {
         return;
@@ -236,7 +263,11 @@ void PageViewIndicator::decreaseNumberOfPages()
 
 void PageViewIndicator::clear()
 {
-    for(auto indexNode : _indexNodes)
+    if ( _currentOverlappingIndexNode ) {
+        _currentOverlappingIndexNode->setVisible(true);
+        _currentOverlappingIndexNode = nullptr;
+    }
+    for(auto& indexNode : _indexNodes)
     {
         removeProtectedChild(indexNode);
     }

@@ -1,6 +1,6 @@
 /****************************************************************************
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2014 Chukong Technologies Inc.
+Copyright (c) 2013-2017 Chukong Technologies Inc.
 
 http://www.cocos2d-x.org
 
@@ -27,7 +27,9 @@ THE SOFTWARE.
 #if CC_TARGET_PLATFORM == CC_PLATFORM_WIN32
 
 #include "platform/win32/CCFileUtils-win32.h"
+#include "platform/win32/CCUtils-win32.h"
 #include "platform/CCCommon.h"
+#include "tinydir/tinydir.h"
 #include <Shlobj.h>
 #include <cstdlib>
 #include <regex>
@@ -58,96 +60,20 @@ static inline std::string convertPathFormatToUnixStyle(const std::string& path)
     return ret;
 }
 
-static std::wstring StringUtf8ToWideChar(const std::string& strUtf8)
-{
-    std::wstring ret;
-    if (!strUtf8.empty())
-    {
-        int nNum = MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(), -1, nullptr, 0);
-        if (nNum)
-        {
-            WCHAR* wideCharString = new WCHAR[nNum + 1];
-            wideCharString[0] = 0;
-
-            nNum = MultiByteToWideChar(CP_UTF8, 0, strUtf8.c_str(), -1, wideCharString, nNum + 1);
-
-            ret = wideCharString;
-            delete[] wideCharString;
-        }
-        else
-        {
-            CCLOG("Wrong convert to WideChar code:0x%x", GetLastError());
-        }
-    }
-    return ret;
-}
-
-static std::string StringWideCharToUtf8(const std::wstring& strWideChar)
-{
-    std::string ret;
-    if (!strWideChar.empty())
-    {
-        int nNum = WideCharToMultiByte(CP_UTF8, 0, strWideChar.c_str(), -1, nullptr, 0, nullptr, FALSE);
-        if (nNum)
-        {
-            char* utf8String = new char[nNum + 1];
-            utf8String[0] = 0;
-
-            nNum = WideCharToMultiByte(CP_UTF8, 0, strWideChar.c_str(), -1, utf8String, nNum + 1, nullptr, FALSE);
-
-            ret = utf8String;
-            delete[] utf8String;
-        }
-        else
-        {
-            CCLOG("Wrong convert to Utf8 code:0x%x", GetLastError());
-        }
-    }
-
-    return ret;
-}
-
-static std::string UTF8StringToMultiByte(const std::string& strUtf8)
-{
-    std::string ret;
-    if (!strUtf8.empty())
-    {
-        std::wstring strWideChar = StringUtf8ToWideChar(strUtf8);
-        int nNum = WideCharToMultiByte(CP_ACP, 0, strWideChar.c_str(), -1, nullptr, 0, nullptr, FALSE);
-        if (nNum)
-        {
-            char* ansiString = new char[nNum + 1];
-            ansiString[0] = 0;
-
-            nNum = WideCharToMultiByte(CP_ACP, 0, strWideChar.c_str(), -1, ansiString, nNum + 1, nullptr, FALSE);
-
-            ret = ansiString;
-            delete[] ansiString;
-        }
-        else
-        {
-            CCLOG("Wrong convert to Ansi code:0x%x", GetLastError());
-        }
-    }
-
-    return ret;
-}
-
 static void _checkPath()
 {
     if (s_resourcePath.empty())
     {
         WCHAR utf16Path[CC_MAX_PATH] = { 0 };
-        GetModuleFileNameW(NULL, utf16Path, CC_MAX_PATH - 1);
-        WCHAR *pUtf16ExePath = &(utf16Path[0]);
+        int nNum = GetCurrentDirectoryW(CC_MAX_PATH - 2, utf16Path);
 
-        // We need only directory part without exe
-        WCHAR *pUtf16DirEnd = wcsrchr(pUtf16ExePath, L'\\');
-
-        char utf8ExeDir[CC_MAX_PATH] = { 0 };
-        int nNum = WideCharToMultiByte(CP_UTF8, 0, pUtf16ExePath, pUtf16DirEnd-pUtf16ExePath+1, utf8ExeDir, sizeof(utf8ExeDir), nullptr, nullptr);
-
-        s_resourcePath = convertPathFormatToUnixStyle(utf8ExeDir);
+        char utf8WorkingDir[CC_MAX_PATH] = { 0 };
+        nNum = WideCharToMultiByte(CP_UTF8, 0, utf16Path, nNum, utf8WorkingDir, sizeof(utf8WorkingDir), nullptr, nullptr);
+        if (nNum < (CC_MAX_PATH - 2)) {
+            utf8WorkingDir[nNum] = '\\';
+            utf8WorkingDir[nNum + 1] = '\0';
+            s_resourcePath = convertPathFormatToUnixStyle(utf8WorkingDir);
+        }
     }
 }
 
@@ -259,6 +185,13 @@ FileUtils::Status FileUtilsWin32::getContents(const std::string& filename, Resiz
 		::CloseHandle(fileHandle);
 		return FileUtils::Status::TooLarge;
 	}
+    // don't read file content if it is empty
+    if (size == 0)
+    {
+        ::CloseHandle(fileHandle);
+        return FileUtils::Status::OK;
+    }
+
     buffer->resize(size);
     DWORD sizeRead = 0;
     BOOL successed = ::ReadFile(fileHandle, buffer->buffer(), size, &sizeRead, nullptr);
@@ -267,7 +200,7 @@ FileUtils::Status FileUtilsWin32::getContents(const std::string& filename, Resiz
     if (!successed) {
 		CCLOG("Get data from file(%s) failed, error code is %s", filename.data(), std::to_string(::GetLastError()).data());
 		buffer->resize(sizeRead);
-		return FileUtils::Status::ReadFaild;
+		return FileUtils::Status::ReadFailed;
     }
     return FileUtils::Status::OK;
 }
@@ -287,6 +220,91 @@ std::string FileUtilsWin32::getFullPathForDirectoryAndFilename(const std::string
     std::string unixFilename = convertPathFormatToUnixStyle(strFilename);
 
     return FileUtils::getFullPathForDirectoryAndFilename(unixDirectory, unixFilename);
+}
+
+void FileUtilsWin32::listFilesRecursively(const std::string& dirPath, std::vector<std::string> *files) const
+{
+    std::string fullpath = fullPathForFilename(dirPath);
+    if (isDirectoryExist(fullpath))
+    {
+        tinydir_dir dir;
+        std::wstring fullpathstr = StringUtf8ToWideChar(fullpath);
+
+        if (tinydir_open(&dir, &fullpathstr[0]) != -1)
+        {
+            while (dir.has_next)
+            {
+                tinydir_file file;
+                if (tinydir_readfile(&dir, &file) == -1)
+                {
+                    // Error getting file
+                    break;
+                }
+                std::string fileName = StringWideCharToUtf8(file.name);
+
+                if (fileName != "." && fileName != "..")
+                {
+                    std::string filepath = StringWideCharToUtf8(file.path);
+                    if (file.is_dir)
+                    {
+                        filepath.append("/");
+                        files->push_back(filepath);
+                        listFilesRecursively(filepath, files);
+                    }
+                    else
+                    {
+                        files->push_back(filepath);
+                    }
+                }
+
+                if (tinydir_next(&dir) == -1)
+                {
+                    // Error getting next file
+                    break;
+                }
+            }
+        }
+        tinydir_close(&dir);
+    }
+}
+
+std::vector<std::string> FileUtilsWin32::listFiles(const std::string& dirPath) const
+{
+    std::string fullpath = fullPathForFilename(dirPath);
+    std::vector<std::string> files;
+    if (isDirectoryExist(fullpath))
+    {
+        tinydir_dir dir;
+        std::wstring fullpathstr = StringUtf8ToWideChar(fullpath);
+
+        if (tinydir_open(&dir, &fullpathstr[0]) != -1)
+        {
+            while (dir.has_next)
+            {
+                tinydir_file file;
+                if (tinydir_readfile(&dir, &file) == -1)
+                {
+                    // Error getting file
+                    break;
+                }
+
+                std::string filepath = StringWideCharToUtf8(file.path);
+                if (file.is_dir)
+                {
+                    filepath.append("/");
+                }
+                files.push_back(filepath);
+
+                if (tinydir_next(&dir) == -1)
+                {
+                    // Error getting next file
+                    break;
+                }
+            }
+        }
+        tinydir_close(&dir);
+    }
+    return files;
 }
 
 string FileUtilsWin32::getWritablePath() const
@@ -420,7 +438,7 @@ bool FileUtilsWin32::createDirectory(const std::string& dirPath)
     if ((GetFileAttributes(path.c_str())) == INVALID_FILE_ATTRIBUTES)
     {
         subpath = L"";
-        for (unsigned int i = 0; i < dirs.size(); ++i)
+        for (unsigned int i = 0, size = dirs.size(); i < size; ++i)
         {
             subpath += dirs[i];
 

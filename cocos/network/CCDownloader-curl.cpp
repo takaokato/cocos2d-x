@@ -1,5 +1,5 @@
 /****************************************************************************
- Copyright (c) 2015-2016 Chukong Technologies Inc.
+ Copyright (c) 2015-2017 Chukong Technologies Inc.
 
  http://www.cocos2d-x.org
 
@@ -108,7 +108,7 @@ namespace cocos2d { namespace network {
             do
             {
                 string dir;
-                unsigned long found = _tempFileName.find_last_of("/\\");
+                size_t found = _tempFileName.find_last_of("/\\");
                 if (found == string::npos)
                 {
                     _errCode = DownloadTask::ERROR_INVALID_PARAMS;
@@ -409,7 +409,7 @@ namespace cocos2d { namespace network {
                 {
                     char buf[256] = {0};
                     sprintf(buf
-                            , "When crequest url(%s) header info, return unexcept http response code(%ld)"
+                            , "When request url(%s) header info, return unexcept http response code(%ld)"
                             , wrapper.first->requestURL.c_str()
                             , httpResponseCode);
                     coTask.setErrorProc(DownloadTask::ERROR_IMPL_INTERNAL, CURLE_OK, buf);
@@ -624,7 +624,8 @@ namespace cocos2d { namespace network {
                 }
 
                 // process tasks in _requestList
-                while (0 == countOfMaxProcessingTasks || coTaskMap.size() < countOfMaxProcessingTasks)
+                auto size = coTaskMap.size();
+                while (0 == countOfMaxProcessingTasks || size < countOfMaxProcessingTasks)
                 {
                     // get task wrapper from request queue
                     TaskWrapper wrapper;
