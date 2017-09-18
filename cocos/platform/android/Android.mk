@@ -12,16 +12,16 @@ CCCommon-android.cpp \
 CCDevice-android.cpp \
 CCGLViewImpl-android.cpp \
 CCFileUtils-android.cpp \
-javaactivity-android.cpp \
 CCEnhanceAPI-android.cpp \
-jni/Java_org_cocos2dx_lib_Cocos2dxAccelerometer.cpp \
-jni/Java_org_cocos2dx_lib_Cocos2dxBitmap.cpp \
-jni/Java_org_cocos2dx_lib_Cocos2dxHelper.cpp \
-jni/Java_org_cocos2dx_lib_Cocos2dxRenderer.cpp \
-jni/Java_org_cocos2dx_lib_Cocos2dxEngineDataManager.cpp \
 jni/JniHelper.cpp \
-jni/TouchesJni.cpp \
 jni/ProcessCpuTracker.cpp
+#javaactivity-android.cpp \
+#jni/Java_org_cocos2dx_lib_Cocos2dxAccelerometer.cpp \
+#jni/Java_org_cocos2dx_lib_Cocos2dxBitmap.cpp \
+#jni/Java_org_cocos2dx_lib_Cocos2dxHelper.cpp \
+#jni/Java_org_cocos2dx_lib_Cocos2dxRenderer.cpp \
+#jni/Java_org_cocos2dx_lib_Cocos2dxEngineDataManager.cpp \
+#jni/TouchesJni.cpp \
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
 

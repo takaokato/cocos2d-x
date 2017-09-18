@@ -15,6 +15,8 @@ CCDownloader-android.cpp \
 Uri.cpp
 
 LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)
+                    
+LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../external/openssl/include/android
 
 LOCAL_STATIC_LIBRARIES := cocos2dx_internal_static
 LOCAL_STATIC_LIBRARIES += libwebsockets_static
