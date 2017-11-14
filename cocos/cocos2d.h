@@ -240,8 +240,10 @@ THE SOFTWARE.
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_LINUX
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT)
+#if !defined(CC_STATIC_LIB)
 	#include "platform/winrt/CCApplication.h"
 	#include "platform/winrt/CCGLViewImpl-winrt.h"
+#endif // !defined(CC_STATIC_LIB)
 	#include "platform/winrt/CCGL.h"
 	#include "platform/winrt/CCStdC.h"
 #endif // CC_TARGET_PLATFORM == CC_PLATFORM_WINRT

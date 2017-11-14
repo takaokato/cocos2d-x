@@ -86,7 +86,9 @@
 #include "deprecated/CCSet.h"
 #include "math/CCAffineTransform.h"
 #include "math/CCGeometry.h"
+#if !defined(CC_STATIC_LIB)
 #include "platform/CCApplication.h"
+#endif // !defined(CC_STATIC_LIB)
 #include "platform/CCFileUtils.h"
 #include "renderer/CCGLProgram.h"
 #include "renderer/CCGLProgramCache.h"
@@ -810,7 +812,9 @@ CC_DEPRECATED_ATTRIBUTE typedef ParticleSmoke CCParticleSmoke;
 CC_DEPRECATED_ATTRIBUTE typedef ParticleSnow CCParticleSnow;
 CC_DEPRECATED_ATTRIBUTE typedef ParticleRain CCParticleRain;
 CC_DEPRECATED_ATTRIBUTE typedef FileUtils CCFileUtils;
+#if !defined(CC_STATIC_LIB)
 CC_DEPRECATED_ATTRIBUTE typedef Application CCApplication;
+#endif // !defined(CC_STATIC_LIB)
 CC_DEPRECATED_ATTRIBUTE typedef GLProgramCache CCShaderCache;
 CC_DEPRECATED_ATTRIBUTE typedef GLProgramCache ShaderCache;
 CC_DEPRECATED_ATTRIBUTE typedef AnimationCache CCAnimationCache;
@@ -1016,6 +1020,7 @@ CC_DEPRECATED_ATTRIBUTE const LanguageType kLanguagePolish      = LanguageType::
 CC_DEPRECATED_ATTRIBUTE typedef LanguageType ccLanguageType;
 
 
+#if !defined(CC_STATIC_LIB)
 CC_DEPRECATED_ATTRIBUTE const Application::Platform kTargetWindows      = Application::Platform::OS_WINDOWS;
 CC_DEPRECATED_ATTRIBUTE const Application::Platform kTargetLinux        = Application::Platform::OS_LINUX;
 CC_DEPRECATED_ATTRIBUTE const Application::Platform kTargetMacOS        = Application::Platform::OS_MAC;
@@ -1036,6 +1041,7 @@ CC_DEPRECATED_ATTRIBUTE const ResolutionPolicy kResolutionShowAll       = Resolu
 CC_DEPRECATED_ATTRIBUTE const ResolutionPolicy kResolutionFixedHeight   = ResolutionPolicy::FIXED_HEIGHT;
 CC_DEPRECATED_ATTRIBUTE const ResolutionPolicy kResolutionFixedWidth    = ResolutionPolicy::FIXED_WIDTH;
 CC_DEPRECATED_ATTRIBUTE const ResolutionPolicy kResolutionUnKnown       = ResolutionPolicy::UNKNOWN;
+#endif // !defined(CC_STATIC_LIB)
 
 
 #define kCCTMXTileHorizontalFlag      kTMXTileHorizontalFlag
