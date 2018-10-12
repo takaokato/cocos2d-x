@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion PROP_COMPILE_SDK_VERSION.toInteger()
-    buildToolsVersion PROP_BUILD_TOOLS_VERSION
 
     defaultConfig {
         minSdkVersion PROP_MIN_SDK_VERSION
@@ -10,22 +9,21 @@ android {
         versionCode 1
         versionName "1.0"
     }
-    sourceSets {
-        main {
-            aidl.srcDir "../java/src"
-            java.srcDir "../java/src"
-            java.exclude "**/Cocos2dxDownloader.java"
-            manifest.srcFile "AndroidManifest.xml"
-        }
+
+    sourceSets.main {
+        aidl.srcDir "../java/src"
+        java.srcDir "../java/src"
+        manifest.srcFile "AndroidManifest.xml"
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
-    compile fileTree(dir: '../java/libs', include: ['*.jar'])
+    implementation fileTree(dir: '../java/libs', include: ['*.jar'])
 }

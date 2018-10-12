@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2014-2017 Chukong Technologies Inc.
+ Copyright (c) 2014-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -212,7 +213,7 @@ void AudioEngineImpl::onEnterBackground(EventCustom* event)
         if (dynamic_cast<UrlAudioPlayer*>(player) != nullptr
             && player->getState() == IAudioPlayer::State::PLAYING)
         {
-            _urlAudioPlayersNeedResume.push_back(player);
+            _urlAudioPlayersNeedResume.emplace(e.first, player);
             player->pause();
         }
     }
@@ -228,9 +229,9 @@ void AudioEngineImpl::onEnterForeground(EventCustom* event)
     }
 
     // resume UrlAudioPlayers
-    for (auto&& player : _urlAudioPlayersNeedResume)
+    for (auto&& iter : _urlAudioPlayersNeedResume)
     {
-        player->resume();
+        iter.second->resume();
     }
     _urlAudioPlayersNeedResume.clear();
 }
@@ -279,6 +280,10 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
                 if (_audioPlayers.find(id) != _audioPlayers.end())
                 {
                     _audioPlayers.erase(id);
+                }
+                if (_urlAudioPlayersNeedResume.find(id) != _urlAudioPlayersNeedResume.end())
+                {
+                    _urlAudioPlayersNeedResume.erase(id);
                 }
 
                 auto iter = _callbackMap.find(id);

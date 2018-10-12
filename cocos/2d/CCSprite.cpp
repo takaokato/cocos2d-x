@@ -2,7 +2,8 @@
 Copyright (c) 2008-2010 Ricardo Quesada
 Copyright (c) 2010-2012 cocos2d-x.org
 Copyright (c) 2011      Zynga Inc.
-Copyright (c) 2013-2017 Chukong Technologies Inc.
+Copyright (c) 2013-2016 Chukong Technologies Inc.
+Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
 http://www.cocos2d-x.org
 
@@ -306,15 +307,15 @@ bool Sprite::initWithTexture(Texture2D *texture, const Rect& rect, bool rotated)
 }
 
 Sprite::Sprite(void)
-: _batchNode(nullptr)
-, _textureAtlas(nullptr)
+: _textureAtlas(nullptr)
+, _batchNode(nullptr)
 , _shouldBeHidden(false)
 , _texture(nullptr)
 , _spriteFrame(nullptr)
-, _insideBounds(true)
 , _renderMode(Sprite::RenderMode::QUAD)
 , _trianglesVertex(nullptr)
 , _trianglesIndex(nullptr)
+, _insideBounds(true)
 , _stretchEnabled(true)
 {
 #if CC_SPRITE_DEBUG_DRAW

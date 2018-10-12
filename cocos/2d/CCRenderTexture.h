@@ -1,7 +1,8 @@
 /****************************************************************************
 Copyright (c) 2009      Jason Booth
 Copyright (c) 2010-2012 cocos2d-x.org
-Copyright (c) 2013-2017 Chukong Technologies Inc.
+Copyright (c) 2013-2016 Chukong Technologies Inc.
+Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
 http://www.cocos2d-x.org
 
@@ -305,6 +306,7 @@ protected:
     Texture2D* _textureCopy;    // a copy of _texture
     Image*     _UITextureImage;
     Texture2D::PixelFormat _pixelFormat;
+    GLuint _depthAndStencilFormat;
     
     // code for "auto" update
     GLbitfield   _clearFlags;
@@ -336,6 +338,8 @@ protected:
     void onClearDepth();
 
     void onSaveToFile(const std::string& fileName, bool isRGBA = true);
+
+    void setupDepthAndStencil(int powW, int powH);
     
     Mat4 _oldTransMatrix, _oldProjMatrix;
     Mat4 _transformMatrix, _projectionMatrix;
