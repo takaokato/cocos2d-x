@@ -314,6 +314,11 @@ public:
      */
     const std::string& getViewName() const;
 
+#if CC_TARGET_PLATFORM == CC_PLATFORM_IOS
+    typedef void* touch_id_t;
+#else
+    typedef int touch_id_t;
+#endif
     /** Touch events are handled by default; if you want to customize your handlers, please override this function.
      *
      * @param num The number of touch.
@@ -321,7 +326,7 @@ public:
      * @param xs The points of x.
      * @param ys The points of y.
      */
-    virtual void handleTouchesBegin(int num, intptr_t ids[], float xs[], float ys[]);
+    virtual void handleTouchesBegin(int num, const touch_id_t ids[], float xs[], float ys[]);
     
     /** Touch events are handled by default; if you want to customize your handlers, please override this function.
      *
@@ -330,7 +335,7 @@ public:
      * @param xs The points of x.
      * @param ys The points of y.
      */
-    virtual void handleTouchesMove(int num, intptr_t ids[], float xs[], float ys[]);
+    virtual void handleTouchesMove(int num, const touch_id_t ids[], float xs[], float ys[]);
 
     /** Touch events are handled by default; if you want to customize your handlers, please override this function.
      *
@@ -341,7 +346,7 @@ public:
      * @param fs The force of 3d touches.
      # @param ms The maximum force of 3d touches
      */
-    virtual void handleTouchesMove(int num, intptr_t ids[], float xs[], float ys[], float fs[], float ms[]);
+    virtual void handleTouchesMove(int num, const touch_id_t ids[], float xs[], float ys[], float fs[], float ms[]);
     
     /** Touch events are handled by default; if you want to customize your handlers, please override this function.
      *
@@ -350,7 +355,7 @@ public:
      * @param xs The points of x.
      * @param ys The points of y.
      */
-    virtual void handleTouchesEnd(int num, intptr_t ids[], float xs[], float ys[]);
+    virtual void handleTouchesEnd(int num, const touch_id_t ids[], float xs[], float ys[]);
     
     /** Touch events are handled by default; if you want to customize your handlers, please override this function.
      *
@@ -359,7 +364,7 @@ public:
      * @param xs The points of x.
      * @param ys The points of y.
      */
-    virtual void handleTouchesCancel(int num, intptr_t ids[], float xs[], float ys[]);
+    virtual void handleTouchesCancel(int num, const touch_id_t ids[], float xs[], float ys[]);
 
     /** Set window icon (implemented for windows and linux).
      *
@@ -438,7 +443,7 @@ public:
 protected:
     void updateDesignResolutionSize();
     
-    void handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num, intptr_t ids[], float xs[], float ys[]);
+    void handleTouchesOfEndOrCancel(EventTouch::EventCode eventCode, int num, const touch_id_t ids[], float xs[], float ys[]);
 
     // real screen size
     Size _screenSize;

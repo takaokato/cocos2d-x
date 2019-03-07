@@ -1360,9 +1360,10 @@ void Console::commandTouchSubCommandTap(int fd, const std::string& args)
         std::srand ((unsigned)time(nullptr));
         _touchId = rand();
         Scheduler *sched = Director::getInstance()->getScheduler();
+        GLView::touch_id_t id = (GLView::touch_id_t)_touchId;
         sched->performFunctionInCocosThread( [&](){
-            Director::getInstance()->getOpenGLView()->handleTouchesBegin(1, &_touchId, &x, &y);
-            Director::getInstance()->getOpenGLView()->handleTouchesEnd(1, &_touchId, &x, &y);
+            Director::getInstance()->getOpenGLView()->handleTouchesBegin(1, &id, &x, &y);
+            Director::getInstance()->getOpenGLView()->handleTouchesEnd(1, &id, &x, &y);
         });
     }
     else
@@ -1392,7 +1393,8 @@ void Console::commandTouchSubCommandSwipe(int fd, const std::string& args)
         Scheduler *sched = Director::getInstance()->getScheduler();
         sched->performFunctionInCocosThread( [=](){
             float tempx = x1, tempy = y1;
-            Director::getInstance()->getOpenGLView()->handleTouchesBegin(1, &_touchId, &tempx, &tempy);
+            GLView::touch_id_t id = (GLView::touch_id_t)_touchId;
+            Director::getInstance()->getOpenGLView()->handleTouchesBegin(1, &id, &tempx, &tempy);
         });
         
         float dx = std::abs(x1 - x2);
@@ -1421,7 +1423,8 @@ void Console::commandTouchSubCommandSwipe(int fd, const std::string& args)
                 }
                 sched->performFunctionInCocosThread( [=](){
                     float tempx = _x_, tempy = _y_;
-                    Director::getInstance()->getOpenGLView()->handleTouchesMove(1, &_touchId, &tempx, &tempy);
+                    GLView::touch_id_t id = (GLView::touch_id_t)_touchId;
+                    Director::getInstance()->getOpenGLView()->handleTouchesMove(1, &id, &tempx, &tempy);
                 });
                 dx -= 1;
             }
@@ -1449,7 +1452,8 @@ void Console::commandTouchSubCommandSwipe(int fd, const std::string& args)
                 }
                 sched->performFunctionInCocosThread( [=](){
                     float tempx = _x_, tempy = _y_;
-                    Director::getInstance()->getOpenGLView()->handleTouchesMove(1, &_touchId, &tempx, &tempy);
+                    GLView::touch_id_t id = (GLView::touch_id_t)_touchId;
+                    Director::getInstance()->getOpenGLView()->handleTouchesMove(1, &id, &tempx, &tempy);
                 });
                 dy -= 1;
             }
@@ -1458,7 +1462,8 @@ void Console::commandTouchSubCommandSwipe(int fd, const std::string& args)
         
         sched->performFunctionInCocosThread( [=](){
             float tempx = x2, tempy = y2;
-            Director::getInstance()->getOpenGLView()->handleTouchesEnd(1, &_touchId, &tempx, &tempy);
+            GLView::touch_id_t id = (GLView::touch_id_t)_touchId;
+            Director::getInstance()->getOpenGLView()->handleTouchesEnd(1, &id, &tempx, &tempy);
         });
         
     }

@@ -289,7 +289,7 @@ protected:
     std::mutex _DebugStringsMutex;
     std::vector<std::string> _DebugStrings;
 
-    intptr_t _touchId;
+    int _touchId;
 
     std::string _bindAddress;
 private:
