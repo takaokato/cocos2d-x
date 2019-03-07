@@ -47,10 +47,10 @@ public class Cocos2dxMusic {
 
     private final Context mContext;
     private MediaPlayer mBackgroundMediaPlayer;
+    private MediaPlayer mBackgroundMediaPlayerNext;
     private float mLeftVolume;
     private float mRightVolume;
     private boolean mPaused; // whether music is paused state.
-    private boolean mIsLoop = false;
     private boolean mManualPaused = false; // whether music is paused manually before the program is switched to the background.
     private boolean mIsAudioFocus = true;
     private String mCurrentPath;
@@ -106,11 +106,26 @@ public class Cocos2dxMusic {
                 if (mBackgroundMediaPlayer != null) {
                     mBackgroundMediaPlayer.release();
                 }
+                if (mBackgroundMediaPlayerNext != null) {
+                    mBackgroundMediaPlayerNext.release();
+                    mBackgroundMediaPlayerNext = null;
+                }
                 mBackgroundMediaPlayer = createMediaPlayer(path);
 
                 // record the path
                 mCurrentPath = path;
             }
+            else if (isLoop && mBackgroundMediaPlayerNext == null) {
+                mBackgroundMediaPlayerNext = createMediaPlayer(path);
+            }
+        }
+        if (isLoop) {
+            prepareForLoop();
+        }
+        else if (mBackgroundMediaPlayerNext != null) {
+            mBackgroundMediaPlayer.setOnCompletionListener(null);
+            mBackgroundMediaPlayerNext.release();
+            mBackgroundMediaPlayerNext = null;
         }
 
         if (mBackgroundMediaPlayer == null) {
@@ -126,13 +141,30 @@ public class Cocos2dxMusic {
                 } else {
                     mBackgroundMediaPlayer.start();
                 }
-                mBackgroundMediaPlayer.setLooping(isLoop);
                 mPaused = false;
-                mIsLoop = isLoop;
             } catch (final Exception e) {
                 Log.e(Cocos2dxMusic.TAG, "playBackgroundMusic: error state");
             }
         }
+    }
+    private MediaPlayer.OnCompletionListener onCompletionListener = new MediaPlayer.OnCompletionListener() {
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            if (mBackgroundMediaPlayerNext != null) {
+                mp.release();
+                mBackgroundMediaPlayer = mBackgroundMediaPlayerNext;
+                mBackgroundMediaPlayerNext = null;
+                prepareForLoop();
+            }
+        }
+    };
+    private void prepareForLoop() {
+        if (mBackgroundMediaPlayerNext != null) {
+            mBackgroundMediaPlayerNext.release();
+        }
+        mBackgroundMediaPlayerNext = createMediaPlayer(mCurrentPath);
+        mBackgroundMediaPlayer.setNextMediaPlayer(mBackgroundMediaPlayerNext);
+        mBackgroundMediaPlayer.setOnCompletionListener(onCompletionListener);
     }
 
     public void stopBackgroundMusic() {
@@ -145,6 +177,10 @@ public class Cocos2dxMusic {
              * play -> pause -> stop -> resume
              */
             this.mPaused = false;
+        }
+        if (mBackgroundMediaPlayerNext != null) {
+            mBackgroundMediaPlayerNext.release();
+            mBackgroundMediaPlayerNext = null;
         }
     }
 
@@ -174,7 +210,7 @@ public class Cocos2dxMusic {
 
     public void rewindBackgroundMusic() {
         if (this.mBackgroundMediaPlayer != null) {
-            playBackgroundMusic(mCurrentPath, mIsLoop);
+            mBackgroundMediaPlayer.seekTo(0);
         }
     }
 
@@ -230,6 +266,9 @@ public class Cocos2dxMusic {
         this.mLeftVolume = this.mRightVolume = volume;
         if (this.mBackgroundMediaPlayer != null && mIsAudioFocus) {
             this.mBackgroundMediaPlayer.setVolume(this.mLeftVolume, this.mRightVolume);
+            if (this.mBackgroundMediaPlayerNext != null) {
+                this.mBackgroundMediaPlayerNext.setVolume(this.mLeftVolume, this.mRightVolume);
+            }
         }
     }
 
@@ -307,6 +346,9 @@ public class Cocos2dxMusic {
             float lVolume = mIsAudioFocus ? mLeftVolume : 0.0f;
             float rVolume = mIsAudioFocus ? mRightVolume : 0.0f;
             mBackgroundMediaPlayer.setVolume(lVolume, rVolume);
+            if (this.mBackgroundMediaPlayerNext != null) {
+                this.mBackgroundMediaPlayerNext.setVolume(lVolume, rVolume);
+            }
         }
     }
 
