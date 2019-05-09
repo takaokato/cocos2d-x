@@ -137,7 +137,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
             return;
         }
 
-        this.hideVirtualButton();
+        // this.hideVirtualButton();
 
         onLoadNativeLibraries();
 
@@ -188,7 +188,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         super.onResume();
         if(gainAudioFocus)
             Cocos2dxAudioFocusManager.registerAudioFocusListener(this);
-        this.hideVirtualButton();
+        // this.hideVirtualButton();
        	resumeIfHasFocus();
 
         Cocos2dxEngineDataManager.resume();
@@ -209,7 +209,7 @@ public abstract class Cocos2dxActivity extends Activity implements Cocos2dxHelpe
         boolean readyToPlay = !isDeviceLocked() && !isDeviceAsleep();
 
         if(hasFocus && readyToPlay) {
-            this.hideVirtualButton();
+            // this.hideVirtualButton();
         	Cocos2dxHelper.onResume();
         	mGLSurfaceView.onResume();
         }

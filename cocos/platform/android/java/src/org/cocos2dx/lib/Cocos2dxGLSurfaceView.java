@@ -24,9 +24,12 @@ THE SOFTWARE.
  ****************************************************************************/
 package org.cocos2dx.lib;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 //import android.opengl.GLSurfaceView;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -34,6 +37,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowInsets;
 import android.view.inputmethod.InputMethodManager;
 
 public class Cocos2dxGLSurfaceView extends GLSurfaceView {
@@ -133,6 +137,9 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 }
             }
         };
+        if (Build.VERSION_CODES.KITKAT_WATCH <= Build.VERSION.SDK_INT) {
+            SetOnApplyWindowInsetsListener();
+        }
     }
 
     // ===========================================================
@@ -409,6 +416,55 @@ public class Cocos2dxGLSurfaceView extends GLSurfaceView {
                 return super.onKeyUp(keyCode, event);
         }
     }
+
+    private int m_windowInsetTop = 0;
+    private int m_windowInsetBottom = 0;
+    private int m_windowInsetLeft = 0;
+    private int m_windowInsetRight = 0;
+    public int getWindowInsetTop()
+    {
+        return m_windowInsetTop;
+    }
+    public int getWindowInsetBottom()
+    {
+        return m_windowInsetBottom;
+    }
+    public int getWindowInsetLeft()
+    {
+        return m_windowInsetLeft;
+    }
+    public int getWindowInsetRight()
+    {
+        return m_windowInsetRight;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
+    private void SetOnApplyWindowInsetsListener()
+    {
+        setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets insets) {
+                m_windowInsetTop = insets.getSystemWindowInsetTop();
+                m_windowInsetBottom = insets.getSystemWindowInsetBottom();
+                m_windowInsetLeft = insets.getSystemWindowInsetLeft();
+                m_windowInsetRight = insets.getSystemWindowInsetRight();
+                return insets;
+            }
+        });
+    }
+
+    @Override
+    protected boolean fitSystemWindows(Rect insets)
+    {
+        if (insets != null) {
+            m_windowInsetTop = insets.top;
+            m_windowInsetBottom = insets.bottom;
+            m_windowInsetLeft = insets.left;
+            m_windowInsetRight = insets.right;
+        }
+        return super.fitSystemWindows(insets);
+    }
+
 
     // ===========================================================
     // Methods
